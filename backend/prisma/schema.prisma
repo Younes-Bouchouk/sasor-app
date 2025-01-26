@@ -14,7 +14,23 @@ model User {
     password  String
     birthday  DateTime
     createdAt DateTime @default(now()) @map("created_at")
-    updatedAt  DateTime @updatedAt @map("updated_at")
+    updatedAt DateTime @updatedAt @map("updated_at")
+
+    followers Relation[] @relation("FollowerRelation")
+    following Relation[] @relation("FollowingRelation")
 
     @@map("user")
+}
+
+model Relation {
+    id          Int      @id @default(autoincrement())
+    followerId  Int      @map("follower_id")
+    followingId Int      @map("following_id")
+    followedAt  DateTime @default(now()) @map("followed_at")
+    
+    follower    User     @relation("FollowerRelation", fields: [followerId], references: [id])
+    following   User     @relation("FollowingRelation", fields: [followingId], references: [id])
+
+    @@unique([followerId, followingId])
+    @@map("relation")
 }
