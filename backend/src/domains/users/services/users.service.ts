@@ -8,7 +8,7 @@ export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
   create(createUserDto: CreateUserDto) {
-    return this.prisma.user.create({
+    return this.prisma.users.create({
       data: {
         name: createUserDto.name,
       },
@@ -16,24 +16,24 @@ export class UsersService {
   }
 
   findAll() {
-    return this.prisma.user.findMany();
+    return this.prisma.users.findMany();
   }
 
   findOne(id: number) {
-    return this.prisma.user.findUnique({
+    return this.prisma.users.findUnique({
 		where: {id}
 	});
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    return this.prisma.user.update({
+    return this.prisma.users.update({
       where: {id},
       data: updateUserDto
     })
   }
 
   remove(id: number) {
-    return this.prisma.user.delete({
+    return this.prisma.users.delete({
       where: {id}
     });
   }
