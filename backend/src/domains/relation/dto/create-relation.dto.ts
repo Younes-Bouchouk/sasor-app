@@ -1,9 +1,12 @@
-import { IsNumber } from 'class-validator';
+import { IsInt, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateRelationDto {
-    @IsNumber()
+    
+    @IsNotEmpty({message: "L'id du follower ne doit pas être vide"})    
+    @IsInt({message: "L'id du follower doit être un nombre"})
     followerId: number;
 
-    @IsNumber()
+    @IsNotEmpty({message: "L'id du follower ne doit pas être vide"})    
+    @IsInt({message: "L'id de l'utilisateur doit être un nombre"})
     followingId: number;
 }
