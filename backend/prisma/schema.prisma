@@ -16,21 +16,93 @@ model User {
     createdAt DateTime @default(now()) @map("created_at")
     updatedAt DateTime @updatedAt @map("updated_at")
 
-    followers Relation[] @relation("FollowerRelation")
-    following Relation[] @relation("FollowingRelation")
+    // Relations avec les autres tables
+    followers           Follow[]           @relation("Follower")
+    following           Follow[]           @relation("Following")
+    organizedEvents     Event[]            @relation()
+    joinedEvents        EventParticipant[] @relation()
+    messagesSent        EventMessage[]     @relation()
+    invitationsSent     EventInvitation[]  @relation("InvitationSender")
+    invitationsReceived EventInvitation[]  @relation("InvitationReceiver")
 
     @@map("user")
 }
 
-model Relation {
+model Follow {
     id          Int      @id @default(autoincrement())
     followerId  Int      @map("follower_id")
     followingId Int      @map("following_id")
     followedAt  DateTime @default(now()) @map("followed_at")
-    
-    follower    User     @relation("FollowerRelation", fields: [followerId], references: [id])
-    following   User     @relation("FollowingRelation", fields: [followingId], references: [id])
+
+    // Relations avec les autres tables
+    follower  User @relation("Follower", fields: [followerId], references: [id])
+    following User @relation("Following", fields: [followingId], references: [id])
 
     @@unique([followerId, followingId])
-    @@map("relation")
+    @@map("follow")
+}
+
+model Event {
+    id              Int      @id @default(autoincrement())
+    organizerId     Int      @map("organizer_id")
+    name            String
+    description     String?
+    sport           String
+    maxParticipants Int      @map("max_participants")
+    location        String
+    private         Boolean
+    plannedAt       DateTime @map("planned_at")
+    createdAt       DateTime @default(now()) @map("created_at")
+    updatedAt       DateTime @updatedAt @map("updated_at")
+
+    // Relation avec les autres tables
+    participation EventParticipant[] @relation()
+    organizer     User               @relation(fields: [organizerId], references: [id])
+    messages      EventMessage[]     @relation()
+    invitations   EventInvitation[]
+
+    @@map("event")
+}
+
+model EventParticipant {
+    id            Int      @id @default(autoincrement())
+    participantId Int      @map("participant_id")
+    eventId       Int      @map("event_id")
+    joinedAt     DateTime @default(now()) @map("joined_at")
+
+    event       Event @relation(fields: [eventId], references: [id])
+    participant User  @relation(fields: [participantId], references: [id])
+
+    @@unique([participantId, eventId])
+    @@map("event_participant")
+}
+
+model EventMessage {
+    id       Int      @id @default(autoincrement())
+    senderId Int      @map("sender_id")
+    eventId  Int      @map("event_id")
+    message  String
+    sentAt   DateTime @default(now()) @map("sent_at")
+
+    sender User  @relation(fields: [senderId], references: [id])
+    event  Event @relation(fields: [eventId], references: [id])
+
+    @@map("event_message")
+}
+
+model EventInvitation {
+    id          Int       @id @default(autoincrement())
+    eventId     Int       @map("event_id")
+    inviterId   Int       @map("inviter_id")
+    inviteeId   Int       @map("invitee_id")
+    status      String    @default("pending")
+    sentAt      DateTime  @default(now()) @map("sent_at")
+    respondedAt DateTime? @map("responded_at")
+
+    event   Event @relation(fields: [eventId], references: [id])
+    inviter User  @relation("InvitationSender", fields: [inviterId], references: [id])
+    invitee User  @relation("InvitationReceiver", fields: [inviteeId], references: [id])
+
+    @@unique([eventId, inviteeId])
+    @@map("event_invitation")
 }

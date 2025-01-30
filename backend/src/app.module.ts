@@ -1,10 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { UserModule } from './domains/user/user.module';
-import { RelationModule } from './domains/relation/relation.module';
+import { FollowModule } from './domains/follow/follow.module';
 
 @Module({
-    imports: [UserModule, RelationModule],
+    imports: [
+        UserModule, 
+        FollowModule
+    ],
     controllers: [AppController],
 })
 export class AppModule {}

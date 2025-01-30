@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 
 export class CreateUserDto {
+    
     @IsNotEmpty({ message: "Le pseudo ne doit pas être vide" })
     @IsString()
     pseudo: string;
