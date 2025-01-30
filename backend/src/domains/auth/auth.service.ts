@@ -9,11 +9,12 @@ export class AuthService {
 
     async register(registerDto: RegisterDto) {
         
+        // Je vérifie si les champs 'mot de passe' et 'confirmer mot de passe' sont différents
         if (registerDto.password !== registerDto.confirmPassword){
             throw new BadRequestException("Les mots de passe sont différents");
         } 
 
-        // Je créer une variable dans laquelle j'effectue une première requête pour récupérer un utilisateur avec le mail saisie
+        // Je créer une variable dans laquelle j'effectue une requête pour récupérer un utilisateur avec l'email saisie
         const existingUser = await this.prisma.user.findUnique({
             where: { email: registerDto.email },
         });
