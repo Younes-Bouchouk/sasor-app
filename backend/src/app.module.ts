@@ -3,12 +3,14 @@ import { AppController } from './app.controller';
 import { UserModule } from './domains/user/user.module';
 import { FollowModule } from './domains/follow/follow.module';
 import { AuthModule } from './domains/auth/auth.module';
+import { EventParticipantModule } from './domains/event-participant/event-participant.module';
 
 @Module({
     imports: [
         UserModule, 
+        AuthModule,
         FollowModule,
-        AuthModule
+        EventParticipantModule,
     ],
     controllers: [AppController],
 })

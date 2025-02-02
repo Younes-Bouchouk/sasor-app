@@ -64,7 +64,7 @@ model Event {
     @@map("event")
 }
 
-model EventParticipant {prsi.
+model EventParticipant {
     id            Int      @id @default(autoincrement())
     participantId Int      @map("participant_id")
     eventId       Int      @map("event_id")
