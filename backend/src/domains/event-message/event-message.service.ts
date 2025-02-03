@@ -13,8 +13,8 @@ export class EventMessageService {
         const existingEvent = await this.prisma.event.findUnique({where: {id: eventId}})
         if (!existingEvent) {throw new BadRequestException("L'event est inexistant")}
 
-        const isParticipant = await this.prisma.eventParticipant.findUnique({
-            where: {id: eventId, participantId: senderId}
+        const isParticipant = await this.prisma.eventParticipant.findFirst({
+            where: {eventId: eventId, participantId: senderId}
         })
         if (!isParticipant) {throw new BadRequestException("Vous ne pouvez pas envoyer de message si ne participer pas à l'event")}
 
