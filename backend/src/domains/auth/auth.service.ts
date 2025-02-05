@@ -1,12 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import * as bcrypt from 'bcryptjs'
 import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
+import { hash, compare } from 'bcryptjs'
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly prisma: PrismaService){}
+    constructor(
+        private readonly prisma: PrismaService, 
+        private readonly jwtService: JwtService
+    ) {}
 
     async register(registerDto: RegisterDto) {
         const { pseudo, email, password, confirmPassword, birthday } =
@@ -23,7 +27,7 @@ export class AuthService {
             throw new BadRequestException("L'email est déjà utilisé");
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await hash(password, 10);
 
         // Sinon, j'effectue la requête qui me permet de créer une nouvelle ligne dans la table User
         return this.prisma.user.create({
@@ -42,9 +46,13 @@ export class AuthService {
         if (!existingUser) { throw new BadRequestException("L'email ne correspond à aucun compte") }
 
         // Vérifier le mot de passe est correcte
-        const isPasswordValid = await bcrypt.compare(loginDto.password, existingUser.password);
+        const isPasswordValid = await compare(loginDto.password, existingUser.password);
         if (!isPasswordValid) { throw new BadRequestException('Le mot de passe est incorrect'); }
 
-        return `Vous êtes bien connecté ${existingUser.pseudo}`;
+
+        const payload = { sub: existingUser.id, pseudo: existingUser.pseudo };
+        return {
+            access_token: this.jwtService.sign(payload),
+        };
     }
 }
