@@ -11,7 +11,7 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { request } from 'http';
+import { AuthenticatedRequest } from 'src/types/AuthUser';
 
 @Controller('auth')
 export class AuthController {
@@ -19,8 +19,8 @@ export class AuthController {
 
     @UseGuards(JwtAuthGuard)
     @Get()
-    async authenticate(@Req() request) {
-        return request.user
+    async authenticate(@Req() req: AuthenticatedRequest) {
+        return req.user
     }
 
     @Post('register')

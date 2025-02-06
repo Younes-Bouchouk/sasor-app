@@ -6,10 +6,14 @@ import {
     Patch,
     Param,
     Delete,
+    UseGuards,
+    Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AuthenticatedRequest } from 'src/types/AuthUser';
 
 @Controller('users')
 export class UsersController {
@@ -22,9 +26,10 @@ export class UsersController {
     }
 
     // Voir mon compte
+    @UseGuards(JwtAuthGuard)
     @Get('me')
-    findMe() {
-        return this.usersService.findMe();
+    findMe(@Req() req: AuthenticatedRequest) {
+        return this.usersService.findMe(req.user);
     }
 
     // Voir un seul utilisateur
@@ -33,15 +38,17 @@ export class UsersController {
         return this.usersService.findOne(+id);
     }
 
-    // Mettre à jour les infos du compte
+    // Mettre à jour les infos de mon compte
+    @UseGuards(JwtAuthGuard)
     @Patch('me')
-    async update(@Body() updateUserDto: UpdateUserDto) {
-        return await this.usersService.update(updateUserDto);
+    async update(@Req() req: AuthenticatedRequest, @Body() updateUserDto: UpdateUserDto) {
+        return await this.usersService.update(req.user, updateUserDto);
     }
 
     // Supprimer mon compte
+    @UseGuards(JwtAuthGuard)
     @Delete('me')
-    remove() {
-        return this.usersService.remove();
+    remove(@Req() req: AuthenticatedRequest) {
+        return this.usersService.remove(req.user);
     }
 }

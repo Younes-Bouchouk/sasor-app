@@ -1,10 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UserTokenData } from 'src/types/AuthUser';
 
 @Injectable()
 export class UsersService {
-    constructor(private readonly prisma: PrismaService){}
+    constructor(private readonly prisma: PrismaService) {}
 
     // Permet de récupérer tous les utilisateurs
     findAll() {
@@ -17,23 +18,29 @@ export class UsersService {
     }
 
     // Permet de récupérer l'utilisateur connecté
-    findMe() {
-        return "Prochainement, après la mise en place du token";
+    findMe(user: UserTokenData) {
+        return this.prisma.user.findUnique({ where: { id: user.id } });
     }
 
     // Permet de mettre à jour les infos de l'utilisateur connecté
-    async update(updateUserDto: UpdateUserDto) {
-        const existingPseudo = await this.prisma.user.findUnique({where: { pseudo: updateUserDto.pseudo }})
-        if (existingPseudo) { throw new BadRequestException("Le pseudo est déjà utilisé") }
+    async update(user: UserTokenData, updateUserDto: UpdateUserDto) {
+        if (updateUserDto.pseudo === user.pseudo)
+            throw new BadRequestException('Vous utilisé déjà ce pseudo')
+
+        const existingPseudo = await this.prisma.user.findUnique({
+            where: { pseudo: updateUserDto.pseudo },
+        });
+        if (existingPseudo)
+            throw new BadRequestException('Le pseudo est déjà utilisé');
 
         return this.prisma.user.update({
-            where: { id: 1 },
-            data: updateUserDto
+            where: { id: user.id },
+            data: updateUserDto,
         });
     }
 
     // Permet de supprimer l'utilisateur connecté
-    remove() {
-        return this.prisma.user.delete({ where: { id: 7 } });
+    remove(user: UserTokenData) {
+        return this.prisma.user.delete({ where: { id: user.id } });
     }
 }
