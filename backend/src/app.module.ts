@@ -1,13 +1,17 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { UserModule } from './domains/user/user.module';
-import { FollowModule } from './domains/follow/follow.module';
+import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from './domains/users/users.module';
 import { AuthModule } from './domains/auth/auth.module';
 import {EventModule} from './domains/event/event.module'
+import { FollowsModule } from './domains/follows/follows.module';
 @Module({
     imports: [
+       ConfigModule.forRoot({
+            isGlobal: true
+        }),
         UserModule, 
-        FollowModule,
+        FollowsModule,
         AuthModule,
         EventModule
     ],
