@@ -1,7 +1,7 @@
 import { IsDate, IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class RegisterDto {
+export class CreateUserDto {
 
     @IsString()
     @IsNotEmpty({ message: "Le pseudo ne doit pas être vide" })
@@ -15,11 +15,6 @@ export class RegisterDto {
     @Length(8, 20, { message: "Le mot de passe doit contenir entre 8 et 20 caractères"})
     @IsNotEmpty({ message: "Le mot de passe ne doit pas être vide" })
     password: string
-
-    @IsString()
-    @Length(8, 20, { message: "Le mot de passe à confirmer ne doit contenir entre 8 et 20 caractères"})
-    @IsNotEmpty({ message: "Le mot de passe à confirmer ne doit pas être vide" })
-    confirmPassword: string
 
     @Type(() => Date)
     @IsDate({ message: "La date de naissance doit être au format ISO-8601" })

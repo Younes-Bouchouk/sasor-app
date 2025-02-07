@@ -42,18 +42,24 @@ model Follow {
     @@map("follow")
 }
 
+enum EventVisibility {
+    PUBLIC
+    PRIVATE
+    FRIENDS
+}
+
 model Event {
-    id              Int      @id @default(autoincrement())
-    organizerId     Int      @map("organizer_id")
+    id              Int             @id @default(autoincrement())
+    organizerId     Int             @map("organizer_id")
     name            String
     description     String?
     sport           String
-    maxParticipants Int      @map("max_participants")
+    maxParticipants Int             @map("max_participants")
     location        String
-    visibility      String   @default("PUBLIC") // PUBLIC , PRIVATE ou FRIENDS-ONLY
-    plannedAt       DateTime @map("planned_at")
-    createdAt       DateTime @default(now()) @map("created_at")
-    updatedAt       DateTime @updatedAt @map("updated_at")
+    visibility      EventVisibility @default(PUBLIC)
+    plannedAt       DateTime        @map("planned_at")
+    createdAt       DateTime        @default(now()) @map("created_at")
+    updatedAt       DateTime        @updatedAt @map("updated_at")
 
     // Relation avec les autres tables
     participation EventParticipant[] @relation()
@@ -69,9 +75,10 @@ model EventParticipant {
     participantId Int      @map("participant_id")
     eventId       Int      @map("event_id")
     joinedAt      DateTime @default(now()) @map("joined_at")
-    event       Event @relation(fields: [eventId], references: [id])
-    participant User  @relation(fields: [participantId], references: [id])
+    event         Event    @relation(fields: [eventId], references: [id])
+    participant   User     @relation(fields: [participantId], references: [id])
 
+    // Relation avec les autres tables
     @@unique([participantId, eventId])
     @@map("event_participant")
 }
@@ -83,21 +90,29 @@ model EventMessage {
     message  String
     sentAt   DateTime @default(now()) @map("sent_at")
 
+    // Relation avec les autres tables
     sender User  @relation(fields: [senderId], references: [id])
     event  Event @relation(fields: [eventId], references: [id])
 
     @@map("event_message")
 }
 
-model EventInvitation {
-    id          Int       @id @default(autoincrement())
-    eventId     Int       @map("event_id")
-    inviterId   Int       @map("inviter_id")
-    inviteeId   Int       @map("invitee_id")
-    status      String    @default("pending")
-    sentAt      DateTime  @default(now()) @map("sent_at")
-    respondedAt DateTime? @map("responded_at")
+enum InvitationStatus {
+    PENDING
+    ACCEPTED
+    DECLINED
+}
 
+model EventInvitation {
+    id          Int              @id @default(autoincrement())
+    eventId     Int              @map("event_id")
+    inviterId   Int              @map("inviter_id")
+    inviteeId   Int              @map("invitee_id")
+    status      InvitationStatus @default(PENDING)
+    sentAt      DateTime         @default(now()) @map("sent_at")
+    respondedAt DateTime?        @map("responded_at")
+
+    // Relation avec les autres tables
     event   Event @relation(fields: [eventId], references: [id])
     inviter User  @relation("InvitationSender", fields: [inviterId], references: [id])
     invitee User  @relation("InvitationReceiver", fields: [inviteeId], references: [id])
