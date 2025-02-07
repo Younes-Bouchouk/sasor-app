@@ -10,7 +10,7 @@ import { FollowsModule } from './domains/follows/follows.module';
        ConfigModule.forRoot({
             isGlobal: true
         }),
-        UserModule, 
+        UsersModule, 
         FollowsModule,
         AuthModule,
         EventModule
