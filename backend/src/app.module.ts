@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { UsersModule } from './domains/users/users.module';
 import { AuthModule } from './domains/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { FollowsModule } from './domains/follows/follows.module';
 
 
 @Module({
@@ -12,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
         }),
         UsersModule,
         AuthModule,
+        FollowsModule,
     ],
     controllers: [AppController],
 })
