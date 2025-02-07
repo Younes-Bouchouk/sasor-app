@@ -14,6 +14,7 @@ import { CreateFollowDto } from './dto/create-follow.dto';
 import { UpdateFollowDto } from './dto/update-follow.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/types/AuthUser';
+import { DeleteFollowDto } from './dto/delete-follow.dto';
 
 @Controller('follows')
 export class FollowsController {
@@ -28,23 +29,31 @@ export class FollowsController {
         return this.followsService.create(createFollowDto, req.user);
     }
 
-    @Get()
-    findAll() {
-        return this.followsService.findAll();
+    @UseGuards(JwtAuthGuard)
+    @Get('/me/followers')
+    findMyFollowers(@Req() req: AuthenticatedRequest) {
+        return this.followsService.findMyFollowers(req.user);
     }
 
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.followsService.findOne(+id);
+    @UseGuards(JwtAuthGuard)
+    @Get('/me/following')
+    findMyFollowing(@Req() req: AuthenticatedRequest) {
+      return this.followsService.findMyFollowing(req.user);
     }
 
-    @Patch(':id')
-    update(@Param('id') id: string, @Body() updateFollowDto: UpdateFollowDto) {
-        return this.followsService.update(+id, updateFollowDto);
+    @Get('/:userId/followers')
+    findUserFollowers(@Param('userId')userId:string) {
+      return this.followsService.findUserFollowers(+userId);
+    }
+    
+    @Get('/:userId/following')
+    findUserFollowing(@Param('userId')userId:string ) {
+      return this.followsService.findUserFollowing(+userId);
     }
 
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.followsService.remove(+id);
+    @UseGuards(JwtAuthGuard)
+    @Delete('me')
+    unfollow (@Body() deleteFollowDto: DeleteFollowDto,@Req() req: AuthenticatedRequest) {
+        return this.followsService.remove(deleteFollowDto, req.user);
     }
 }

@@ -20,14 +20,18 @@ export class FollowsService {
             throw new BadRequestException("le compte à suivre n'existe pas");
 
         if (existingFollower.id === existingFollowing.id)
-          throw new BadRequestException ("vous ne pouver pas suivre votre propre compte")
+            throw new BadRequestException(
+                'vous ne pouver pas suivre votre propre compte',
+            );
 
         const alreadyFollow = await this.prisma.follow.findFirst({
-          where: {followingId: createFollowDto.followingId, followerId: user.id}
+            where: {
+                followingId: createFollowDto.followingId,
+                followerId: user.id,
+            },
         });
         if (alreadyFollow)
-          throw new BadRequestException ("vous suivez déja cet utilisateur")
-        
+            throw new BadRequestException('vous suivez déja cet utilisateur');
 
         const newFollow = await this.prisma.follow.create({
             data: {
@@ -38,19 +42,72 @@ export class FollowsService {
         return newFollow;
     }
 
-    findAll() {
-        return `This action returns all follows`;
+    findMyFollowers(user: UserTokenData) {
+        return this.prisma.follow.findMany({
+            where: {
+                followingId: user.id,
+            },
+            include: {
+                follower: {
+                    select: { pseudo: true },
+                },
+            },
+        });
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} follow`;
+    findMyFollowing(user: UserTokenData) {
+        return this.prisma.follow.findMany({
+            where: {
+                followerId: user.id,
+            },
+            include: {
+                following: {
+                    select: { pseudo: true },
+                },
+            },
+        });
     }
 
-    update(id: number, updateFollowDto: UpdateFollowDto) {
-        return `This action updates a #${id} follow`;
+    findUserFollowers(userId) {
+        return this.prisma.follow.findMany({
+            where: {
+                followingId: userId,
+            },
+            include: {
+                follower: {
+                    select: { pseudo: true },
+                },
+            },
+        });
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} follow`;
+    findUserFollowing(userId) {
+        return this.prisma.follow.findMany({
+            where: {
+                followerId: userId,
+            },
+            include: {
+                following: {
+                    select: { pseudo: true },
+                },
+            },
+        });
+    }
+
+    async remove(deleteFollowDto, user: UserTokenData) {
+        const Follow = await this.prisma.follow.findFirst({
+            where: {
+                followingId: deleteFollowDto.followingId,
+                followerId: user.id,
+            },
+        });
+        if (!Follow)
+            throw new BadRequestException('Vous ne suiver pas ce compte');
+        const deletefollow = await this.prisma.follow.delete({
+            where: {
+                id: Follow.id,
+            },
+        });
+        return 'vous ne suiver plus ce compte';
     }
 }
