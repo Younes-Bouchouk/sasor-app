@@ -1,3 +1,5 @@
+import { EventVisibility } from '@prisma/client';
+import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, IsEnum, IsDate } from 'class-validator';
 
 export class CreateEventDto {
@@ -19,8 +21,9 @@ export class CreateEventDto {
 
   @IsOptional()
   @IsEnum(['PUBLIC', 'PRIVATE', 'FRIENDS-ONLY'])
-  visibility?: string = 'PUBLIC';
+  visibility?: EventVisibility = 'PUBLIC';
 
-  @IsDate()
+  @Type(() => Date)
+  @IsDate({ message: "La date de naissance doit être au format ISO-8601" })
   plannedAt: Date;
 }

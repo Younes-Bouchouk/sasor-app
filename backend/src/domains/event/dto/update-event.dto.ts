@@ -1,3 +1,4 @@
+import { EventVisibility } from '@prisma/client';
 import { IsInt, IsOptional, IsString, IsEnum, IsDate } from 'class-validator';
 
 export class UpdateEventDto {
@@ -23,7 +24,7 @@ export class UpdateEventDto {
 
   @IsOptional()
   @IsEnum(['PUBLIC', 'PRIVATE', 'FRIENDS-ONLY'])
-  visibility?: string;
+  visibility?: EventVisibility;
 
   @IsOptional()
   @IsDate()

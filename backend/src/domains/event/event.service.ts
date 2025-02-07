@@ -33,12 +33,12 @@ export class EventService {
   }
   /*
                         ! Récupérer les événements créés par une liste de personnes suivies.  */
-  async getFollowersEvents(followerIds: number[]) {
-    return await this.prisma.event.findMany({
-      // Vérifie si l'organisateur est dans la liste
-      where: { organizerId: { in: followerIds } },
-    });
-  }
+  // async getFollowersEvents(followerIds: number[]) {
+  //   return await this.prisma.event.findMany({
+  //     // Vérifie si l'organisateur est dans la liste
+  //     where: { organizerId: { in: followerIds } },
+  //   });
+  // }
   /*
                          ! trouver un seul evenement avec son id*/
   async getEventById(eventId: number) {
@@ -48,8 +48,10 @@ export class EventService {
                           !Modifier un événement existant.*/
   async updateEvent(eventId: number, data: UpdateEventDto) {
     return await this.prisma.event.update({
-      where: { id: eventId },
-      data,
+      where: { id: Number(eventId) },// préciser le type number 
+      data : {
+        ...data, 
+      },
     });
   }
   /* 
@@ -61,7 +63,7 @@ export class EventService {
                           !Obtenir la liste des participants d'un événement.*/
   async getEventParticipants(eventId: number) {
     return await this.prisma.eventParticipant.findMany({
-      where: { eventId },
+      where: { eventId: Number(eventId) },
       include: { participant: true },
     });
   }
@@ -69,14 +71,14 @@ export class EventService {
                           !Ajouter un utilisateur comme participant à un événement.*/
   async joinEvent(userId: number, eventId: number) {
     return await this.prisma.eventParticipant.create({
-      data: { participantId: userId, eventId },
+      data: { participantId: userId,eventId: Number(eventId)},
     });
   }
                       /*
                       !Supprimer un utilisateur de la liste des participants.*/ 
   async leaveEvent(userId: number, eventId: number) {
     return await this.prisma.eventParticipant.deleteMany({
-      where: { participantId: userId, eventId },
+      where: { participantId: userId, eventId: Number(eventId) },
     });
   }
 }
