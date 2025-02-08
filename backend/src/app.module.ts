@@ -5,6 +5,7 @@ import { UsersModule } from './domains/users/users.module';
 import { AuthModule } from './domains/auth/auth.module';
 import {EventModule} from './domains/event/event.module'
 import { FollowsModule } from './domains/follows/follows.module';
+import { EventsMessagesModule } from './domains/events-messages/events-messages.module';
 @Module({
     imports: [
        ConfigModule.forRoot({
@@ -13,7 +14,8 @@ import { FollowsModule } from './domains/follows/follows.module';
         UsersModule, 
         FollowsModule,
         AuthModule,
-        EventModule
+        EventModule,
+        EventsMessagesModule,
     ],
     controllers: [AppController],
 })
