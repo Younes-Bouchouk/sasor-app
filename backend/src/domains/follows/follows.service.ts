@@ -1,29 +1,37 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateFollowDto } from './dto/create-follow.dto';
-import { UpdateFollowDto } from './dto/update-follow.dto';
 import { UserTokenData } from 'src/types/AuthUser';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class FollowsService {
     constructor(private readonly prisma: PrismaService) {}
-    async create(createFollowDto: CreateFollowDto, user: UserTokenData) {
-        const existingFollower = await this.prisma.user.findUnique({
-            where: { id: user.id },
-        });
-        if (!existingFollower)
-            throw new BadRequestException("le compte du follower n'existe pas");
-        const existingFollowing = await this.prisma.user.findUnique({
-            where: { id: createFollowDto.followingId },
-        });
-        if (!existingFollowing)
-            throw new BadRequestException("le compte à suivre n'existe pas");
 
+    /*
+     * Permet de suivre un autre utilisateur
+     * Vérifie si les utilisateurs existent
+     * Vérifie si les utilisateurs sont différents
+     * Vérifie que l'utilisateur le suis déjà'
+     * puis insère le suivis dans la table 'follow'
+     */
+    async create(createFollowDto: CreateFollowDto, user: UserTokenData) {
+        // Vérifier que l'utilisateur qui suit existe
+        const existingFollower = await this.checkUserExist(user.id)
+        if (!existingFollower)
+            throw new BadRequestException("Le compte du suiveur n'existe pas");
+        
+        // Vérifier que l'utilisateur à suivre existe
+        const existingFollowing = await this.checkUserExist(createFollowDto.followingId)
+        if (!existingFollowing)
+            throw new BadRequestException("Le compte à suivre n'existe pas");
+
+        // Empêche l'utilisateur de se suivre lui même
         if (existingFollower.id === existingFollowing.id)
             throw new BadRequestException(
-                'vous ne pouver pas suivre votre propre compte',
+                'Vous ne pouvez pas suivre votre propre compte',
             );
-
+        
+        // Vérifier si l'utilisateur est déjà suivit
         const alreadyFollow = await this.prisma.follow.findFirst({
             where: {
                 followingId: createFollowDto.followingId,
@@ -31,15 +39,16 @@ export class FollowsService {
             },
         });
         if (alreadyFollow)
-            throw new BadRequestException('vous suivez déja cet utilisateur');
+            throw new BadRequestException('Vous suivez déjà cet utilisateur');
 
+        // Création du suivis
         const newFollow = await this.prisma.follow.create({
             data: {
                 followerId: user.id,
                 followingId: createFollowDto.followingId,
             },
         });
-        return newFollow;
+        return 'L\'utilisateur a été suivie avec succès';
     }
 
     findMyFollowers(user: UserTokenData) {
@@ -110,4 +119,15 @@ export class FollowsService {
         });
         return 'vous ne suiver plus ce compte';
     }
+
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+    /* - - - - - - - - - - FONCTIONS PRIVÉES - - - - - - - - - - */
+    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+    private async checkUserExist (userId: number) {
+        return await this.prisma.user.findUnique({
+            where: { id: userId },
+        });
+    }
+
 }

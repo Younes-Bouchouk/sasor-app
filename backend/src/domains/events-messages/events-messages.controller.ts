@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { EventsMessagesService } from './events-messages.service';
 import { CreateEventsMessageDto } from './dto/create-events-message.dto';
-import { UpdateEventsMessageDto } from './dto/update-events-message.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/types/AuthUser';
 
@@ -21,6 +20,7 @@ export class EventsMessagesController {
         private readonly eventsMessagesService: EventsMessagesService,
     ) {}
 
+    // Route pour envoyer un message dans le chat d'un event
     @UseGuards(JwtAuthGuard)
     @Post()
     send(
@@ -31,6 +31,7 @@ export class EventsMessagesController {
         return this.eventsMessagesService.send(req.user, +eventId, createEventsMessageDto);
     }
 
+    // Route pour consulter le chat d'un event
     @UseGuards(JwtAuthGuard)
     @Get()
     findAll(
