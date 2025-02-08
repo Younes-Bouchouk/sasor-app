@@ -27,11 +27,12 @@ export class EventController {
     return this.eventService.getUserEvents(req.user.id);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Get('followers')
-  // getFollowersEvents(@Req() req:AuthenticatedRequest) {
-  //   return this.eventService.getFollowersEvents(req.user.followingIds);
-  // }
+  @UseGuards(JwtAuthGuard)
+@Get('followers')
+getFollowersEvents(@Req() req:AuthenticatedRequest) {
+  return this.eventService.getFollowersEvents(req.user.id);
+}
+
 
   @Get(':eventId')
   getEvent(@Param('eventId') eventId: number) {
