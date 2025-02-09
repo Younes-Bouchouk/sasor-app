@@ -44,7 +44,7 @@ export class EventService {
         const followingIds = following.map((f) => f.followingId);
 
         if (followingIds.length === 0) {
-            return []; // Aucun follower, aucun événement
+            return "aucun evenement ou aucun follower"; 
         }
 
         // Récupérer les événements des utilisateurs suivis

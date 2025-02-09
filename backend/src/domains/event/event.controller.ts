@@ -27,7 +27,7 @@ export class EventController {
     return this.eventService.getUserEvents(req.user.id);
   }
 
-  @UseGuards(JwtAuthGuard)
+ @UseGuards(JwtAuthGuard)
 @Get('followers')
 getFollowersEvents(@Req() req:AuthenticatedRequest) {
   return this.eventService.getFollowersEvents(req.user.id);
