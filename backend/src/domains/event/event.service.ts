@@ -19,9 +19,29 @@ export class EventService {
     }
     /*
                           ! Récupérer tous les événements. */
-    async getAllEvents() {
+    async getAllEvents(userId: number) {
         //retourne toutes les lignes de la table event.
-        return await this.prisma.event.findMany();
+        const allEvents = await this.prisma.event.findMany({
+            where: {
+                OR: [
+                    { visibility: 'PUBLIC' },
+                    { visibility: 'FRIENDS' }
+                ]
+            }
+        }); 
+
+        const eventsFiltered = await Promise.all(
+            allEvents.map( async event => {
+                if (event.visibility == 'FRIENDS') {
+                    const isFriend = await this.prisma.follow.findFirst({
+                        where: { followerId: userId , followingId: event.organizerId}
+                    })
+                    if (isFriend) return event
+                }
+            }).filter(Boolean)
+        )
+
+        return eventsFiltered
     }
     /*
                         !  Récupérer les événements créés par un utilisateur spécifique. */
@@ -44,7 +64,7 @@ export class EventService {
         const followingIds = following.map((f) => f.followingId);
 
         if (followingIds.length === 0) {
-            return "aucun evenement ou aucun follower"; 
+            return 'aucun evenement ou aucun follower';
         }
 
         // Récupérer les événements des utilisateurs suivis
