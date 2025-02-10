@@ -23,25 +23,35 @@ export class EventService {
         //retourne toutes les lignes de la table event.
         const allEvents = await this.prisma.event.findMany({
             where: {
-                OR: [
-                    { visibility: 'PUBLIC' },
-                    { visibility: 'FRIENDS' }
-                ]
-            }
-        }); 
+                OR: [{ visibility: 'PUBLIC' }, { visibility: 'FRIENDS' }],
+            },
+        });
 
         const eventsFiltered = await Promise.all(
-            allEvents.map( async event => {
+            allEvents.map(async (event) => {
                 if (event.visibility == 'FRIENDS') {
-                    const isFriend = await this.prisma.follow.findFirst({
-                        where: { followerId: userId , followingId: event.organizerId}
-                    })
-                    if (isFriend) return event
-                }
-            }).filter(Boolean)
-        )
+                    const isFollower = await this.prisma.follow.findFirst({
+                        where: {
+                            followerId: userId,
+                            followingId: event.organizerId,
+                        },
+                    });
+                    if (!isFollower) return null;
 
-        return eventsFiltered
+                    const isFollowing = await this.prisma.follow.findFirst({
+                        where: {
+                            followerId: event.organizerId,
+                            followingId: userId,
+                        },
+                    });
+                    if (!isFollowing) return null;
+                }
+
+                return event;
+            }),
+        );
+
+        return eventsFiltered.filter((event) => event !== null);
     }
     /*
                         !  Récupérer les événements créés par un utilisateur spécifique. */
@@ -105,7 +115,7 @@ export class EventService {
     async getEventParticipants(eventId: number) {
         return await this.prisma.eventParticipant.findMany({
             where: { eventId: Number(eventId) },
-            include: { participant: true },
+            include: { participant: { select: { id: true, pseudo: true } } },
         });
     }
     /*
@@ -118,8 +128,11 @@ export class EventService {
     /*
                       !Supprimer un utilisateur de la liste des participants.*/
     async leaveEvent(userId: number, eventId: number) {
-        return await this.prisma.eventParticipant.deleteMany({
+        const deleteParticipant = await this.prisma.eventParticipant.deleteMany({
             where: { participantId: userId, eventId: Number(eventId) },
         });
+        if (deleteParticipant.count == 1){
+            return 'vous avez bien quitté l\'événement'
+        }
     }
 }
