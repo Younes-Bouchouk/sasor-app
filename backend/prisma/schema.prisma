@@ -74,6 +74,7 @@ model EventParticipant {
     id            Int      @id @default(autoincrement())
     participantId Int      @map("participant_id")
     eventId       Int      @map("event_id")
+    canInvite     Boolean  @default(false)
     joinedAt      DateTime @default(now()) @map("joined_at")
     event         Event    @relation(fields: [eventId], references: [id])
     participant   User     @relation(fields: [participantId], references: [id])
