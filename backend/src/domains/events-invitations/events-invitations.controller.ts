@@ -25,7 +25,7 @@ export class EventsInvitationsController {
     @Post('/:eventId/invitations')
     create(
         @Req() req: AuthenticatedRequest,
-        @Param('eventId') eventId: number,
+        @Param('eventId') eventId: string,
         @Body() createEventsInvitationDto: CreateEventsInvitationDto,
     ) {
         return this.eventsInvitationsService.create(
@@ -35,9 +35,13 @@ export class EventsInvitationsController {
         );
     }
 
-    @Get()
-    findAll() {
-        return this.eventsInvitationsService.findAll();
+    @UseGuards(JwtAuthGuard)
+    @Get('invitations/:invitationId')
+    findInvite(
+        @Req() req: AuthenticatedRequest,
+        @Param('invitationId') invitationId: string,
+    ) {
+        return this.eventsInvitationsService.findInvite(req.user, +invitationId);
     }
 
     @Get(':id')

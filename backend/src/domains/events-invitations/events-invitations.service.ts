@@ -66,8 +66,17 @@ export class EventsInvitationsService {
         return 'Invitation envoyé avec succès'
     }
 
-    findAll() {
-        return `This action returns all eventsInvitations`;
+    async findInvite(user: UserTokenData, invitationId: number) {
+        // Vérfier que l'invitation existe
+        const existingInvite = await this.prisma.eventInvitation.findUnique({
+            where: { id: invitationId }
+        })
+        if (!existingInvite) throw new BadRequestException("L'invitation est introuvable")
+
+        // Vérifier que l'utilisateur est soit l'inviteur ou l'invité
+        if (existingInvite.inviterId !== user.id && existingInvite.inviteeId !== user.id) throw new BadRequestException("Vous n'êtes pas concerné par cette invitation")
+
+        return existingInvite
     }
 
     findOne(id: number) {
