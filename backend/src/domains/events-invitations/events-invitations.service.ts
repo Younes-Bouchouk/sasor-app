@@ -66,7 +66,7 @@ export class EventsInvitationsService {
         return 'Invitation envoyé avec succès'
     }
 
-    async findInvite(user: UserTokenData, invitationId: number) {
+    async findOneInvite(user: UserTokenData, invitationId: number) {
         // Vérfier que l'invitation existe
         const existingInvite = await this.prisma.eventInvitation.findUnique({
             where: { id: invitationId }
@@ -79,8 +79,16 @@ export class EventsInvitationsService {
         return existingInvite
     }
 
-    findOne(id: number) {
-        return `This action returns a #${id} eventsInvitation`;
+    findInvitationsReceived(user: UserTokenData) {
+        return this.prisma.eventInvitation.findMany({
+            where: { inviteeId: user.id}
+        });
+    }
+
+    findInvitationsSent(user: UserTokenData) {
+        return this.prisma.eventInvitation.findMany({
+            where: { inviterId: user.id}
+        });
     }
 
     update(id: number, updateEventsInvitationDto: UpdateEventsInvitationDto) {

@@ -36,17 +36,28 @@ export class EventsInvitationsController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Get('invitations/received')
+    findInvitationsReceived(
+        @Req() req: AuthenticatedRequest,
+    ) {
+        return this.eventsInvitationsService.findInvitationsReceived(req.user);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('invitations/sent')
+    findInvitationsSent(
+        @Req() req: AuthenticatedRequest,
+    ) {
+        return this.eventsInvitationsService.findInvitationsSent(req.user);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Get('invitations/:invitationId')
-    findInvite(
+    findOneInvite(
         @Req() req: AuthenticatedRequest,
         @Param('invitationId') invitationId: string,
     ) {
-        return this.eventsInvitationsService.findInvite(req.user, +invitationId);
-    }
-
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.eventsInvitationsService.findOne(+id);
+        return this.eventsInvitationsService.findOneInvite(req.user, +invitationId);
     }
 
     @Patch(':id')
