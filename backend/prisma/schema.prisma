@@ -111,7 +111,7 @@ model EventInvitation {
     inviteeId   Int              @map("invitee_id")
     status      InvitationStatus @default(PENDING)
     sentAt      DateTime         @default(now()) @map("sent_at")
-    respondedAt DateTime?        @map("responded_at")
+    respondedAt DateTime         @updatedAt @map("responded_at")
 
     // Relation avec les autres tables
     event   Event @relation(fields: [eventId], references: [id])

@@ -91,8 +91,45 @@ export class EventsInvitationsService {
         });
     }
 
-    update(id: number, updateEventsInvitationDto: UpdateEventsInvitationDto) {
-        return `This action updates a #${id} eventsInvitation`;
+    async acceptInvitation(user: UserTokenData, invitationId: number) {
+        const invitation = await this.prisma.eventInvitation.findFirst({
+            where: { id: invitationId }
+        })
+        if (!invitation) throw new BadRequestException("L'invitation est introuvable")
+        if (invitation.inviteeId !== user.id) throw new BadRequestException("Vous n'êtes pas l'utilisateur invité à cet event")
+        if (invitation.status === 'ACCEPTED') throw new BadRequestException("L'invitation a déjà été accepté")
+        if (invitation.status === 'DECLINED') throw new BadRequestException("L'invitation n'est plus disponible")
+
+        const event = await this.prisma.event.findUnique({
+            where: { id: invitation.eventId }
+        })
+        if (!event) throw new BadRequestException("Event introuvable")
+
+        const isParticipant = await this.prisma.eventParticipant.findFirst({
+            where: { eventId: event.id, participantId: user.id}
+        })    
+        if (isParticipant) throw new BadRequestException("Vous participez déjà à l'event")
+
+        const particpants = await this.prisma.eventParticipant.findMany({
+            where: { id: event.id },
+        })
+
+        if (particpants.length >= event.maxParticipants) throw new BadRequestException("L'event est complet")
+
+        await this.prisma.eventInvitation.update({
+            where: { id: invitationId },
+            data: { status: "ACCEPTED" }
+        })
+
+        await this.prisma.eventParticipant.create({
+            data: {
+                eventId: event.id,
+                participantId: user.id
+            }
+        })
+
+        return "Vous avez acceptez l'invtation"
+        
     }
 
     remove(id: number) {

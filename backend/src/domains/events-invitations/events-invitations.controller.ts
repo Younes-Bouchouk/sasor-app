@@ -60,19 +60,14 @@ export class EventsInvitationsController {
         return this.eventsInvitationsService.findOneInvite(req.user, +invitationId);
     }
 
-    @Patch(':id')
-    update(
-        @Param('id') id: string,
-        @Body() updateEventsInvitationDto: UpdateEventsInvitationDto,
+    @UseGuards(JwtAuthGuard)
+    @Patch('invitations/:invitationId/accept')
+    acceptInvitation(
+        @Req() req: AuthenticatedRequest,
+        @Param('invitationId') invitationId: string,
     ) {
-        return this.eventsInvitationsService.update(
-            +id,
-            updateEventsInvitationDto,
-        );
+        return this.eventsInvitationsService.acceptInvitation(req.user, +invitationId);
     }
 
-    @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.eventsInvitationsService.remove(+id);
-    }
+    
 }
