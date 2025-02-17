@@ -121,18 +121,52 @@ export class EventService {
     /*
                           !Ajouter un utilisateur comme participant à un événement.*/
     async joinEvent(userId: number, eventId: number) {
+        // Récupérer l'événement
+        const event = await this.prisma.event.findUnique({
+            where: { id: Number(eventId) },
+            select: { visibility: true },
+        });
+
+        if (!event) {
+           return 'Événement introuvable.';
+        }
+
+        // Vérifier si l'événement est PUBLIC
+        if (event.visibility === 'PUBLIC') {
+            return await this.prisma.eventParticipant.create({
+                data: { participantId: userId, eventId: Number(eventId) },
+            });
+        }
+
+        // Vérifier si l'utilisateur est invité à l'événement
+        const invitation = await this.prisma.eventInvitation.findFirst({
+            where: {
+                eventId: Number(eventId),
+                inviteeId: Number(userId),
+                status: 'ACCEPTED',
+            },
+        });
+
+        if (!invitation) {
+            return 'Vous ne pouvez rejoindre cet événement que si vous êtes invité et que l\'invitation a été acceptée.';
+        }
+
+        // Ajouter l'utilisateur à l'événement en tant que participant
         return await this.prisma.eventParticipant.create({
-            data: { participantId: userId, eventId: Number(eventId) },
+            data: { participantId: userId, eventId: eventId },
         });
     }
+
     /*
                       !Supprimer un utilisateur de la liste des participants.*/
     async leaveEvent(userId: number, eventId: number) {
-        const deleteParticipant = await this.prisma.eventParticipant.deleteMany({
-            where: { participantId: userId, eventId: Number(eventId) },
-        });
-        if (deleteParticipant.count == 1){
-            return 'vous avez bien quitté l\'événement'
+        const deleteParticipant = await this.prisma.eventParticipant.deleteMany(
+            {
+                where: { participantId: userId, eventId: Number(eventId) },
+            },
+        );
+        if (deleteParticipant.count == 1) {
+            return "vous avez bien quitté l'événement";
         }
     }
 }
