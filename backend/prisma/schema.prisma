@@ -102,6 +102,7 @@ enum InvitationStatus {
     PENDING
     ACCEPTED
     DECLINED
+    CANCELED
 }
 
 model EventInvitation {
