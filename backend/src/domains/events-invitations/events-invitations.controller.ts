@@ -78,5 +78,14 @@ export class EventsInvitationsController {
         return this.eventsInvitationsService.declineInvitation(req.user, +invitationId);
     }
 
+    @UseGuards(JwtAuthGuard)
+    @Delete('invitations/:invitationId/cancel')
+    cancelInvitation(
+        @Req() req: AuthenticatedRequest,
+        @Param('invitationId') invitationId: string,
+    ) {
+        return this.eventsInvitationsService.cancelInvitation(req.user, +invitationId);
+    }
+
     
 }

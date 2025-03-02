@@ -80,7 +80,7 @@ export class EventsInvitationsService {
                 "Vous n'êtes pas autorisé à inviter qui que ce soit",
             );
 
-        const newInvite = await this.prisma.eventInvitation.create({
+        await this.prisma.eventInvitation.create({
             data: {
                 eventId,
                 inviterId: user.id,
@@ -185,7 +185,7 @@ export class EventsInvitationsService {
             where: { id: invitationId },
             data: { status: 'ACCEPTED' },
         });
-        
+
         return "Vous avez accepté l'invtation";
     }
 
@@ -243,7 +243,38 @@ export class EventsInvitationsService {
         return "Vous avez refusé l'invtation";
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} eventsInvitation`;
+    // Permet d'accepter une invitation reçue
+    async cancelInvitation(user: UserTokenData, invitationId: number) {
+        // Vérifier si l'invitation existe bien
+        const invitation = await this.prisma.eventInvitation.findFirst({
+            where: { id: invitationId },
+        });
+        if (!invitation)
+            throw new BadRequestException("L'invitation est introuvable");
+
+        // Vérifier si l'utilisateur invité est l'utilisateur connecté
+        if (invitation.inviterId !== user.id)
+            throw new BadRequestException(
+                "Vous n'êtes pas l'utilisateur qui a envoyé l'invitation",
+            );
+        
+        if (invitation.status === 'CANCELED')
+            throw new BadRequestException("L'invitation a déjà été annulé");
+
+        if (['ACCEPTED', 'DECLINED'].includes(invitation.status))
+            throw new BadRequestException("L'invitation a déjà été accpeté ou refusé");
+
+
+        // Change le status de l'invitation en 'CANCELED'
+        const canceledInvitation = await this.prisma.eventInvitation.update({
+            where: { id: invitationId },
+            data: { status: 'CANCELED' },
+        });
+
+
+        return {
+            message: "Vous avez annulé l'invtation",
+            invitation: canceledInvitation
+        };
     }
 }
