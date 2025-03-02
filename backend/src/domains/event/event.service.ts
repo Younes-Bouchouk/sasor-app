@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { kMaxLength } from 'buffer';
 
 @Injectable()
 export class EventService {
@@ -10,12 +11,26 @@ export class EventService {
                           ! Créer un nouvel événement organisé par un utilisateur. */
     //via al methode POSTA joute un nouvel enregistrement dans la table event.
     async createEvent(userId: number, data: CreateEventDto) {
-        return await this.prisma.event.create({
+        const newEvent = await this.prisma.event.create({
             data: {
                 organizerId: userId,
                 ...data, // Les autres infos de l'événement (nom, date, etc.)
             },
         });
+
+        const newParticipant = await this.prisma.eventParticipant.create({
+            data: {
+                participantId: userId,
+                eventId: newEvent.id,
+                canInvite: true
+            }
+        })
+
+        return {
+            message: "Création terminé avec succès !",
+            event: newEvent,
+            participant: newParticipant
+        }
     }
     /*
                           ! Récupérer tous les événements. */

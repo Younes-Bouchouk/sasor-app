@@ -2,9 +2,14 @@ generator client {
     provider = "prisma-client-js"
 }
 
+// datasource db {
+//     provider = "mysql"
+//     url      = env("DATABASE_URL")
+// }
+
 datasource db {
-    provider = "mysql"
-    url      = env("DATABASE_URL")
+    provider = "sqlite"
+    url      = "file:./dev.db"
 }
 
 model User {
@@ -74,6 +79,7 @@ model EventParticipant {
     id            Int      @id @default(autoincrement())
     participantId Int      @map("participant_id")
     eventId       Int      @map("event_id")
+    canInvite     Boolean  @default(false)
     joinedAt      DateTime @default(now()) @map("joined_at")
     event         Event    @relation(fields: [eventId], references: [id])
     participant   User     @relation(fields: [participantId], references: [id])
@@ -101,6 +107,7 @@ enum InvitationStatus {
     PENDING
     ACCEPTED
     DECLINED
+    CANCELED
 }
 
 model EventInvitation {
@@ -110,7 +117,7 @@ model EventInvitation {
     inviteeId   Int              @map("invitee_id")
     status      InvitationStatus @default(PENDING)
     sentAt      DateTime         @default(now()) @map("sent_at")
-    respondedAt DateTime?        @map("responded_at")
+    respondedAt DateTime         @updatedAt @map("responded_at")
 
     // Relation avec les autres tables
     event   Event @relation(fields: [eventId], references: [id])

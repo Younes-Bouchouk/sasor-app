@@ -24,6 +24,6 @@ export class CreateEventDto {
   visibility?: EventVisibility = 'PUBLIC';
 
   @Type(() => Date)
-  @IsDate({ message: "La date de naissance doit être au format ISO-8601" })
+  @IsDate({ message: "La date de l'event doit être au format ISO-8601" })
   plannedAt: Date;
 }
