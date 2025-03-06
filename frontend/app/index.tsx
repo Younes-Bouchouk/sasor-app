@@ -3,7 +3,7 @@ import { Text, View } from "react-native";
 
 export default function Index() {
     return (
-        
+
         <View
             style={{
                 flex: 1,
@@ -12,9 +12,12 @@ export default function Index() {
             }}
         >
             <Text>Page d'accueil ( provisoir bien sûr )</Text>
-            {/* <Link href={""}>Inscription</Link>
-            <Link href={""}>Connexion</Link> */}
+
+            <Link href={"/register"}>Inscription</Link>
+            <Link href={"/login"}>Connexion</Link>
             <Link href={"/event"}>Event</Link>
         </View>
     );
 }
+
+
