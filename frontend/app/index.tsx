@@ -13,7 +13,7 @@ export default function Index() {
             <Text>Page d'accueil ( provisoir bien sûr )</Text>
             <Link href={"/register"}>Inscription</Link>
             <Link href={"/login"}>Connexion</Link>
-            <Link href={"/events"}>Event</Link>
+            <Link href={"/event"}>Event</Link>
         </View>
     );
 }
