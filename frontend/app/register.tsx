@@ -1,22 +1,25 @@
 import { useState } from "react";
 import { View, TextInput, Button, Text } from "react-native";
-import { useForm, Controller, useWatch } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 const schema = yup.object({
-    pseudo: yup.string(),
-    email: yup.string(),
-    password: yup.string(),
-    birthday: yup.string(),
+    pseudo: yup.string().required("Pseudo obligatoire"),
+    email: yup.string().email("Email invalide").required("Email obligatoire"),
+    password: yup.string().min(8, "Minimum 8 caractères").required("Mot de passe requis"),
+    confirmPassword: yup.string()
+        .oneOf([yup.ref("password")], "Les mots de passe ne correspondent pas")
+        .required("Confirmation du mot de passe requise"),
+    birthday: yup.string().required("Date de naissance obligatoire"),
 });
 
 interface FormData {
-    pseudo: string,
-    email: string,
-    password: string,
-    confirmPassword: string,
-    birthday: string,
+    pseudo: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+    birthday: string;
 }
 
 export default function Register() {
@@ -24,114 +27,145 @@ export default function Register() {
         control,
         handleSubmit,
         formState: { errors },
-        watch,
-    } = useForm({ resolver: yupResolver(schema) });
+    } = useForm<FormData>({ resolver: yupResolver(schema) });
 
-    const [errorMessage, setErrorMessage] = useState()
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const submit = async (formData) => {
+    const submit = async (formData: FormData) => {
         try {
-            const response = await fetch('http://localhost:4000/auth/register', {
-                method: 'POST',
+            const response = await fetch("http://localhost:4000/auth/register", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify(formData),
             });
-            const data = await response.json(); // ✅ Attendre que la réponse JSON soit parsée
-            console.log(data); // ✅ Maintenant, on a bien les données
+
+            const data = await response.json();
+            if (!response.ok) {
+                setErrorMessage(data.message || "Erreur lors de l'inscription");
+            } else {
+                console.log("Inscription réussie :", data);
+                setErrorMessage("");
+            }
         } catch (error) {
             console.error("Erreur lors de la requête :", error);
+            setErrorMessage("Erreur de connexion au serveur");
         }
     };
 
     return (
-        <View
-            style={{
-                flex: 1,
-                alignItems: "center",
-                padding: 10,
-                gap: 5,
-            }}
-        >
+        <View style={{ flex: 1, alignItems: "center", padding: 10, gap: 5 }}>
             <Text>Page d'inscription</Text>
-            <View style={{ gap: 5 }}>
+            <View style={{ gap: 10 }}>
+                {/** Pseudo */}
                 <Controller
                     name="pseudo"
                     control={control}
                     render={({ field: { onChange, value } }) => (
-                        <View style={{ flexDirection: "row", gap: 5 }}>
+                        <View>
                             <Text>Pseudo</Text>
                             <TextInput
-                                style={{ border: "1px solid black" }}
+                                style={styles.input}
                                 value={value}
                                 onChangeText={onChange}
                             />
+                            {errors.pseudo && <Text style={styles.error}>{errors.pseudo.message}</Text>}
                         </View>
                     )}
                 />
+
+                {/** Email */}
                 <Controller
                     name="email"
                     control={control}
                     render={({ field: { onChange, value } }) => (
-                        <View style={{ flexDirection: "row", gap: 5 }}>
+                        <View>
                             <Text>Email</Text>
                             <TextInput
-                                style={{ border: "1px solid black" }}
+                                style={styles.input}
                                 value={value}
                                 onChangeText={onChange}
+                                keyboardType="email-address"
                             />
+                            {errors.email && <Text style={styles.error}>{errors.email.message}</Text>}
                         </View>
                     )}
                 />
+
+                {/** Mot de passe */}
                 <Controller
                     name="password"
                     control={control}
                     render={({ field: { onChange, value } }) => (
-                        <View style={{ flexDirection: "row", gap: 5 }}>
+                        <View>
                             <Text>Mot de passe</Text>
                             <TextInput
-                                style={{ border: "1px solid black" }}
+                                style={styles.input}
                                 value={value}
                                 onChangeText={onChange}
+                                secureTextEntry
                             />
+                            {errors.password && <Text style={styles.error}>{errors.password.message}</Text>}
                         </View>
                     )}
                 />
-                                <Controller
+
+                {/** Confirmation du mot de passe */}
+                <Controller
                     name="confirmPassword"
                     control={control}
                     render={({ field: { onChange, value } }) => (
-                        <View style={{ flexDirection: "row", gap: 5 }}>
-                            <Text>Mot de passe à confirmer</Text>
+                        <View>
+                            <Text>Confirmer le mot de passe</Text>
                             <TextInput
-                                style={{ border: "1px solid black" }}
+                                style={styles.input}
                                 value={value}
                                 onChangeText={onChange}
+                                secureTextEntry
                             />
+                            {errors.confirmPassword && <Text style={styles.error}>{errors.confirmPassword.message}</Text>}
                         </View>
                     )}
                 />
+
+                {/** Date de naissance */}
                 <Controller
                     name="birthday"
                     control={control}
                     render={({ field: { onChange, value } }) => (
-                        <View style={{ flexDirection: "row", gap: 5 }}>
+                        <View>
                             <Text>Date de naissance</Text>
                             <TextInput
-                                style={{ border: "1px solid black" }}
+                                style={styles.input}
                                 value={value}
                                 onChangeText={onChange}
+                                placeholder="YYYY-MM-DD"
                             />
+                            {errors.birthday && <Text style={styles.error}>{errors.birthday.message}</Text>}
                         </View>
                     )}
                 />
-                <Button
-                    title="Continue"
-                    onPress={handleSubmit(submit)}
-                />
+
+                {/** Bouton de soumission */}
+                <Button title="S'inscrire" onPress={handleSubmit(submit)} />
             </View>
-            <Text>{errorMessage}</Text>
+
+            {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
         </View>
     );
 }
+
+const styles = {
+    input: {
+        borderWidth: 1,
+        borderColor: "black",
+        padding: 10,
+        borderRadius: 5,
+        width: 250,
+    },
+    error: {
+        color: "red",
+        fontSize: 12,
+    },
+};
