@@ -32,9 +32,9 @@ export default function EventScreen() {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            {/* Image de l'événement (mettre une image par défaut si aucune image n'est dispo) */}
+            {/* Image de l'événement (image par défaut si aucune image n'est dispo) */}
             <Image 
-              source={{ uri: item.image || "https://media.senscritique.com/media/000019558961/0/foot_2_rue.jpg" }}
+              source={{ uri: item.image || "https://media.discordapp.net/attachments/1171507476168978523/1337375709793882112/logo_white_mini.png?ex=67cb78f0&is=67ca2770&hm=1f960710a4beade9be6922c0fb8d6cf92c549d497e22fb0eab34f3f9146e3620&=&format=webp&quality=lossless&width=625&height=625" }}
               style={styles.image}
             />
             <View style={styles.cardContent}>
@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     overflow: "hidden",
-    elevation: 3, // Ombre Android
+    elevation: 3, 
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,

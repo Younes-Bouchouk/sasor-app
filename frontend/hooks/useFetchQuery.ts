@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-const endpoint = "http://localhost:4000"; 
+const endpoint = "http://10.49.33.130:4000"; 
 
 export function useFetchQuery(path: string, token: string) {
   return useQuery({

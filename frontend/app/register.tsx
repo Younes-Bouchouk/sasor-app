@@ -3,6 +3,7 @@ import { View, TextInput, Button, Text } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { router } from "expo-router";
 
 const schema = yup.object({
     pseudo: yup.string().required("Pseudo obligatoire"),
@@ -34,7 +35,7 @@ export default function Register() {
 
     const submit = async (formData: FormData) => {
         try {
-            const response = await fetch("http://localhost:4000/auth/register", {
+            const response = await fetch("http://10.49.33.130:4000/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -50,6 +51,7 @@ export default function Register() {
                 console.log("Inscription réussie :", data);
                 setErrorMessage(data.access_token);
                 setSuccessMessage("Inscription réussie")
+                router.push("/event"); 
             }
         } catch (error) {
             console.error("Erreur lors de la requête :", error);

@@ -16,7 +16,7 @@ interface FormData {
 }
 
 const LoginScreen = () => {
-  const router = useRouter(); // Hook pour la navigation 🚀
+  const router = useRouter(); 
   const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: yupResolver(schema),
   });
