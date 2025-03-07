@@ -30,6 +30,7 @@ export default function Register() {
     } = useForm<FormData>({ resolver: yupResolver(schema) });
 
     const [errorMessage, setErrorMessage] = useState("");
+    const [successMessage, setSuccessMessage] = useState("");
 
     const submit = async (formData: FormData) => {
         try {
@@ -44,13 +45,16 @@ export default function Register() {
             const data = await response.json();
             if (!response.ok) {
                 setErrorMessage(data.message || "Erreur lors de l'inscription");
+                setSuccessMessage("")
             } else {
                 console.log("Inscription réussie :", data);
-                setErrorMessage("");
+                setErrorMessage(data.access_token);
+                setSuccessMessage("Inscription réussie")
             }
         } catch (error) {
             console.error("Erreur lors de la requête :", error);
             setErrorMessage("Erreur de connexion au serveur");
+            setSuccessMessage("")
         }
     };
 
@@ -151,6 +155,7 @@ export default function Register() {
                 <Button title="S'inscrire" onPress={handleSubmit(submit)} />
             </View>
 
+            {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
             {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
         </View>
     );
@@ -166,6 +171,10 @@ const styles = {
     },
     error: {
         color: "red",
+        fontSize: 12,
+    },
+    success: {
+        color: "green",
         fontSize: 12,
     },
 };
