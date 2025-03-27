@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text, ActivityIndicator, FlatList, StyleSheet, Image } from "react-native";
-import { useFetchQuery } from "../hooks/useFetchQuery"; 
+import { useFetchQuery } from "../../hooks/useFetchQuery"; 
+import { useAuth } from "../../contexts/AuthProvider";
 
 export default function EventScreen() {
-  const { data, isLoading, error } = useFetchQuery(
-    "/events",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicHNldWRvIjoia2hhbGlkIiwiaWF0IjoxNzQxMTgxODk4LCJleHAiOjE3NDM3NzM4OTh9.Ucten3UhlPda7ZSAAhw7cqvCyXbm_3a2kavLD4HEKWw"
-  ); 
+  const { token } = useAuth();
+  const { data, isLoading, error } = useFetchQuery("event","/events");
+
 
   if (isLoading) {
     return (

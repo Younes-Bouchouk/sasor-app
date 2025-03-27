@@ -11,9 +11,9 @@ export default function Index() {
             }}
         >
             <Text>Page d'accueil ( provisoire bien sûr  )</Text>
-            <Link href={"/register"}>Inscription</Link>
-            <Link href={"/login"}>Connexion</Link>
-            <Link href={"/event"}>Event</Link>
+            <Link href={"/screens/register"}>Inscription</Link>
+            <Link href={"/screens/login"}>Connexion</Link>
+            <Link href={"/screens/event"}>Event</Link>
         </View>
     );
 }

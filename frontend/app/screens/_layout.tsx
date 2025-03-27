@@ -1,11 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { AuthProvider } from "../../contexts/AuthProvider";
 
 const queryClient = new QueryClient();
 
 export default function Layout() {
   return (
+    <AuthProvider>
     <QueryClientProvider client={queryClient}>
       <Tabs
         screenOptions={({ route }) => ({
@@ -14,7 +16,7 @@ export default function Layout() {
             if (route.name === "index") iconName = "home-outline";
             else if (route.name === "event") iconName = "calendar-outline";
 
-            return <Ionicons name={iconName} size={size} color={color} />;
+            return <Ionicons name={iconName} size={size} color={color}  />;
           },
           tabBarActiveTintColor: "#18709E",
           tabBarInactiveTintColor: "gray",
@@ -45,5 +47,6 @@ export default function Layout() {
 
       </Tabs>
     </QueryClientProvider>
+    </AuthProvider>
   );
 }

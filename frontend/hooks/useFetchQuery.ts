@@ -1,33 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { fetchAPI } from "../services/api";
 
-const endpoint = "http://10.49.33.130:4000"; 
-
-export function useFetchQuery(path: string, token: string) {
+export function useFetchQuery(key: string, path: string) {
   return useQuery({
-    queryKey: [path],
+    queryKey: [key],
     queryFn: async () => {
-      try {
-        console.log("Requête vers :", `${endpoint}${path}`);
-
-        const response = await fetch(`${endpoint}${path}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("Données reçues :", data);
-        return data;
-      } catch (error) {
-        console.error("Erreur lors de la requête :", error);
-        throw error;
-      }
+      const token = await AsyncStorage.getItem("authToken");
+      return fetchAPI(path, "GET", undefined, token || undefined);
     },
   });
 }
