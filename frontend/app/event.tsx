@@ -1,11 +1,11 @@
 import React from "react";
 import { View, Text, ActivityIndicator, FlatList, StyleSheet, Image } from "react-native";
-import { useFetchQuery } from "../../hooks/useFetchQuery"; 
-import { useAuth } from "../../contexts/AuthProvider";
+import { useFetchQuery } from "../hooks/useFetchQuery"; 
+import { useAuth } from "../contexts/AuthProvider";
 
 export default function EventScreen() {
   const { token } = useAuth();
-  const { data, isLoading, error } = useFetchQuery("event","/events");
+  const { data, isLoading, error } = useFetchQuery("event","/events",);
 
 
   if (isLoading) {
@@ -34,7 +34,7 @@ export default function EventScreen() {
           <View style={styles.card}>
             {/* Image de l'événement (image par défaut si aucune image n'est dispo) */}
             <Image 
-              source={{ uri: item.image || "https://media.discordapp.net/attachments/1171507476168978523/1337375709793882112/logo_white_mini.png?ex=67cb78f0&is=67ca2770&hm=1f960710a4beade9be6922c0fb8d6cf92c549d497e22fb0eab34f3f9146e3620&=&format=webp&quality=lossless&width=625&height=625" }}
+              source={{ uri: item.image || "https://cdn.discordapp.com/attachments/1171507476168978523/1337375709793882112/logo_white_mini.png?ex=67e9cb70&is=67e879f0&hm=cb4cea901f1890b7ec3221b95fbade37ba72bfeb7fcd2b3901ab4d0e21b09e42&" }}
               style={styles.image}
             />
             <View style={styles.cardContent}>

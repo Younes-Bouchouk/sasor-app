@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { AuthProvider } from "../../contexts/AuthProvider";
+import { AuthProvider } from "../contexts/AuthProvider";
 
 const queryClient = new QueryClient();
 

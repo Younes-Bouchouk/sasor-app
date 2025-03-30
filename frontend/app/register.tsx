@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { router } from "expo-router";
-import { useRegisterMutation } from "../../hooks/useRegisterMutations";
+import { useRegisterMutation } from "../hooks/useRegisterMutations";
 
 const schema = yup.object({
   pseudo: yup.string().required("Pseudo obligatoire"),

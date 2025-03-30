@@ -4,8 +4,8 @@ import { View, TextInput, Button, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useAuth } from "../../contexts/AuthProvider";
-import { fetchAPI } from "../../services/api";
+import { useAuth } from "../contexts/AuthProvider";
+import { fetchAPI } from "../services/api";
 
 //  Schéma de validation avec Yup
 const schema = yup.object({
