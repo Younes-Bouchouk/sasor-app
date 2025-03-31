@@ -16,6 +16,7 @@ export default function Layout() {
       let iconName;
       if (route.name === "index") iconName = "home-outline";
       else if (route.name === "event/event") iconName = "calendar-outline";
+      else if (route.name === "profile") iconName ="person-outline";
 
       return <Ionicons name={iconName} size={size} color={color} />;
     },
@@ -36,11 +37,16 @@ export default function Layout() {
       shadowRadius: 10,
       shadowOpacity: 0.1,
     },
+          
   })}
 >
   {/* Onglets visibles */}
   <Tabs.Screen name="index" options={{ title: "Accueil" }} />
   <Tabs.Screen name="event" options={{ title: "Événements" }} />
+  <Tabs.Screen name="profile" options={{title: "profil"}}/>
+
+
+
 
   {/* Onglets cachés */}
   <Tabs.Screen name="login" options={{ href: null }} />
