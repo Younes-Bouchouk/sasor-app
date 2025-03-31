@@ -47,7 +47,7 @@ const LoginScreen = () => {
 
       //  Stockage du token et redirection
       await login(result.access_token);
-      router.push("/screens/event"); 
+      router.push("/event/event"); 
       
     } catch (error) {
       console.error("Erreur de connexion :", error);

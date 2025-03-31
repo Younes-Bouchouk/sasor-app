@@ -7,6 +7,7 @@ export function useFetchQuery(key: string, path: string) {
     queryKey: [key],
     queryFn: async () => {
       const token = await AsyncStorage.getItem("authToken");
+      console.log(token)
       return fetchAPI(path, "GET", undefined, token || undefined);
     },
   });

@@ -11,7 +11,9 @@ export const fetchAPI = async (path: string, method: string = "GET", body?: obje
       body: body ? JSON.stringify(body) : undefined,
     });
 
-    const data = await response.json();
+    // Vérifier si la réponse est vide avant de parser
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : {};
 
     if (!response.ok) {
       throw new Error(data.message || "Une erreur est survenue");

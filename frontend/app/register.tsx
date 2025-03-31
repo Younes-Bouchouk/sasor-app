@@ -38,7 +38,7 @@ export default function Register() {
     mutate(formData, {
       onSuccess: (data) => {
         setSuccessMessage("Inscription réussie !");
-        router.push("/screens/event");
+        router.push("/event/event");
       },
       onError: (err: any) => {
         console.error("Erreur :", err.message);
