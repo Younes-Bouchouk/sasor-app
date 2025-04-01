@@ -1,53 +1,59 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { View, TextInput, Button, Text } from "react-native";
+import { View, TextInput, Button, Text, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useAuth } from "../contexts/AuthProvider";
+import { fetchAPI } from "../services/api";
 
+//  Schéma de validation avec Yup
 const schema = yup.object({
   email: yup.string().email("Email invalide").required("Email obligatoire"),
   password: yup.string().min(6, "6 caractères min").required("Mot de passe requis"),
 });
 
+//  Définition de l'interface des données du formulaire
 interface FormData {
   email: string;
   password: string;
 }
 
 const LoginScreen = () => {
-  const router = useRouter(); 
+  const router = useRouter();
+  const { login } = useAuth(); // Récupération de la fonction login
   const { control, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: yupResolver(schema),
   });
 
   const [loginError, setLoginError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  //  Fonction de soumission du formulaire
   const onSubmit = async (data: FormData) => {
+    setLoginError(""); // Reset des erreurs
+    setLoading(true);
+
     try {
-      const response = await fetch("http://10.49.33.130:4000/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      //  Appel API propre avec la fonction centralisée `fetchAPI`
+      const result = await fetchAPI("/auth/login", "POST", data);
 
-      const result = await response.json();
-
-      if (!response.ok) {
-        setLoginError(result.message || "Email ou mot de passe incorrect.");
+      if (!result.access_token) {
+        setLoginError("Email ou mot de passe incorrect.");
+        setLoading(false);
         return;
       }
 
-      console.log("Connexion réussie:", result);
-      setLoginError("");
-
-      // ✅ Redirection après connexion réussie
-      router.push("/event"); 
+      //  Stockage du token et redirection
+      await login(result.access_token);
+      router.push("/event/event"); 
       
     } catch (error) {
-      console.error("Erreur lors de l'envoi des données:", error);
+      console.error("Erreur de connexion :", error);
       setLoginError("Une erreur est survenue. Veuillez réessayer.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -55,6 +61,7 @@ const LoginScreen = () => {
     <View style={{ flex: 1, alignItems: "center", padding: 10, gap: 5 }}>
       <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>Connexion</Text>
 
+      {/* Champ Email */}
       <Controller
         name="email"
         control={control}
@@ -63,6 +70,8 @@ const LoginScreen = () => {
             placeholder="Email"
             value={value}
             onChangeText={onChange}
+            keyboardType="email-address"
+            autoCapitalize="none"
             style={{
               borderWidth: 1,
               borderColor: "black",
@@ -76,6 +85,7 @@ const LoginScreen = () => {
       />
       {errors.email && <Text style={{ color: "red" }}>{errors.email.message}</Text>}
 
+      {/* Champ Mot de passe */}
       <Controller
         name="password"
         control={control}
@@ -91,18 +101,22 @@ const LoginScreen = () => {
                 borderColor: "black",
                 padding: 10,
                 borderRadius: 5,
-                width: 250,
+                width: 210,
               }}
             />
-            <Button title={showPassword ? "👁" : "👁‍🗨"} onPress={() => setShowPassword(!showPassword)} />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Text style={{ marginLeft: 10 }}>{showPassword ? "👁" : "👁‍🗨"}</Text>
+            </TouchableOpacity>
           </View>
         )}
       />
       {errors.password && <Text style={{ color: "red" }}>{errors.password.message}</Text>}
 
+      {/* Affichage des erreurs */}
       {loginError ? <Text style={{ color: "red", marginBottom: 10 }}>{loginError}</Text> : null}
 
-      <Button title="Se connecter" onPress={handleSubmit(onSubmit)} />
+      {/* Bouton de connexion */}
+      <Button title={loading ? "Connexion..." : "Se connecter"} onPress={handleSubmit(onSubmit)} disabled={loading} />
     </View>
   );
 };

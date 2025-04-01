@@ -39,8 +39,56 @@ export class UsersService {
         });
     }
 
-    // Permet de supprimer l'utilisateur connecté
-    remove(user: UserTokenData) {
-        return this.prisma.user.delete({ where: { id: user.id } });
+    async remove(user: UserTokenData) {
+        //  Supprimer les participations aux événements organisés par l'utilisateur
+        await this.prisma.eventParticipant.deleteMany({
+            where: {
+                event: { organizerId: user.id }
+            },
+        });
+    
+        //  Supprimer les participations de l'utilisateur
+        await this.prisma.eventParticipant.deleteMany({
+            where: { participantId: user.id },
+        });
+    
+        //  Supprimer les messages envoyés par l'utilisateur
+        await this.prisma.eventMessage.deleteMany({
+            where: { senderId: user.id },
+        });
+    
+        // Supprimer les messages liés aux événements organisés par l'utilisateur
+        await this.prisma.eventMessage.deleteMany({
+            where: {
+                event: { organizerId: user.id }
+            },
+        });
+    
+        // Supprimer les invitations envoyées et reçues
+        await this.prisma.eventInvitation.deleteMany({
+            where: {
+                OR: [{ inviterId: user.id }, { inviteeId: user.id }],
+            },
+        });
+    
+        // Supprimer les invitations liées aux événements organisés par l'utilisateur
+        await this.prisma.eventInvitation.deleteMany({
+            where: {
+                event: { organizerId: user.id }
+            },
+        });
+    
+        //  Supprimer les événements organisés par l'utilisateur
+        await this.prisma.event.deleteMany({
+            where: { organizerId: user.id },
+        });
+    
+        //  Supprimer l'utilisateur après avoir tout nettoyé
+        return this.prisma.user.delete({
+            where: { id: user.id },
+        });
     }
+    
+    
+      
 }
