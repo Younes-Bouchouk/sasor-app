@@ -1,5 +1,5 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, FlatList } from "react-native";
-import { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, FlatList, Animated } from "react-native";
+import { useState, useRef } from "react";
 import { useCreateEvent } from "@/hooks/useCreateEvents";
 import { useFetchCities } from "@/hooks/useFetchCities";
 import { useFetchSports } from "@/hooks/useFetchSport";
@@ -13,8 +13,8 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
   const { mutate, isPending, isError, error } = useCreateEvent();
   const [currentStep, setCurrentStep] = useState(1);
   const [query, setQuery] = useState("");
-  const { cities, loading } = useFetchCities(query);
-  const { sports } = useFetchSports(query);
+  const { cities, loading: loadingCities } = useFetchCities(query);
+  const { sports, loading: loadingSports } = useFetchSports(query);
   const [eventData, setEventData] = useState({
     name: "",
     sport: "",
@@ -25,6 +25,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
   });
 
   const [errorMessage, setErrorMessage] = useState("");
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
   const validateForm = () => {
     if (currentStep === 1 && !eventData.name) return "Le nom de l'événement est requis !";
@@ -34,19 +35,25 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
     return "";
   };
 
-  const nextStep = () => {
+  const transitionToNextStep = () => {
     const validationError = validateForm();
     if (validationError) {
       setErrorMessage(validationError);
       return;
     }
     setErrorMessage("");
-    setCurrentStep((prev) => prev + 1);
-  };
-
-  const prevStep = () => {
-    setErrorMessage("");
-    setCurrentStep((prev) => prev - 1);
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start(() => {
+      setCurrentStep((prev) => prev + 1);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    });
   };
 
   const submit = () => {
@@ -68,12 +75,14 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
     });
   };
 
+  function prevStep(event: GestureResponderEvent): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <View style={styles.modalContainer}>
-      <View style={styles.modalContent}>
+      <Animated.View style={[styles.modalContent, { opacity: fadeAnim }]}> 
         <Text style={styles.modalTitle}>Créer un événement</Text>
-
-        {/* Étape 1: Nom */}
         {currentStep === 1 && (
           <>
             <TextInput
@@ -82,44 +91,39 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               value={eventData.name}
               onChangeText={(text) => setEventData({ ...eventData, name: text })}
             />
-            <TouchableOpacity style={styles.button} onPress={nextStep}>
+            <TouchableOpacity style={styles.button} onPress={transitionToNextStep}>
               <Text style={styles.buttonText}>Suivant</Text>
             </TouchableOpacity>
           </>
         )}
 
-           {/* Étape 2: Sélection du sport */}
         {currentStep === 2 && (
           <>
             <TextInput
               placeholder="Sport"
               style={styles.input}
-              value={eventData.sport}
-              onChangeText={(text) => {
-                setQuery(text); // Mettre à jour la requête pour l'autocomplétion
-                setEventData({ ...eventData, sport: text });
-              }}
+              value={query}
+              onChangeText={setQuery}
             />
-
-            {/* Affichage des suggestions */}
-            {loading && <ActivityIndicator size="small" color="#007AFF" />}
+            {loadingSports && <ActivityIndicator size="small" color="#007AFF" />}
             <FlatList
               data={sports}
               keyExtractor={(item) => item}
               renderItem={({ item }) => (
-                <TouchableOpacity onPress={() => setEventData({ ...eventData, sport: item })}>
+                <TouchableOpacity onPress={() => {
+                  setEventData({ ...eventData, sport: item });
+                  setQuery(item); // Met à jour la requête affichée
+                }}>
                   <Text style={styles.suggestion}>{item}</Text>
                 </TouchableOpacity>
               )}
             />
-
-            <TouchableOpacity style={styles.button} onPress={() => setCurrentStep(3)}>
+            <TouchableOpacity style={styles.button} onPress={transitionToNextStep}>
               <Text style={styles.buttonText}>Suivant</Text>
             </TouchableOpacity>
           </>
-
-        )}          
-          {currentStep === 3 && (
+        )}
+        {currentStep === 3 && (
             <>
               <TextInput
                 placeholder="Lieu"
@@ -132,7 +136,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               />
 
               {/* Affichage des suggestions */}
-              {loading && <ActivityIndicator size="small" color="#007AFF" />}
+              {<ActivityIndicator size="small" color="#007AFF" />}
               <FlatList
                 data={cities}
                 keyExtractor={(item) => item}
@@ -158,37 +162,47 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               value={eventData.plannedAt}
               onChangeText={(text) => setEventData({ ...eventData, plannedAt: text })}
             />
-            <TouchableOpacity style={styles.button} onPress={prevStep}>
-              <Text style={styles.buttonText}>Retour</Text>
-            </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={submit}>
               <Text style={styles.buttonText}>Créer</Text>
             </TouchableOpacity>
           </>
         )}
+         {/* Étape 5: visibilité */}
+         {currentStep === 4 && (
+          <>
+            <TextInput
+              placeholder="Date (YYYY-MM-DD)"
+              style={styles.input}
+              value={eventData.plannedAt}
+              onChangeText={(text) => setEventData({ ...eventData, plannedAt: text })}
+            />
+            <TouchableOpacity style={styles.button} onPress={submit}>
+              <Text style={styles.buttonText}>Créer</Text>
+            </TouchableOpacity>
+          </>
+        )}
+        
 
-        {/* Affichage des messages */}
         {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
         {isError ? <Text style={styles.errorText}>{error?.message}</Text> : null}
-
-        {/* Affichage du chargement */}
         {isPending && <ActivityIndicator size="small" color="#007AFF" />}
-
-        {/* Annuler */}
         <TouchableOpacity onPress={onClose}>
           <Text style={styles.cancelText}>Annuler</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
     </View>
   );
+  
 }
+
+
 const styles = StyleSheet.create({
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
-  modalContent: { backgroundColor: "#fff", padding: 20, borderRadius: 10, width: "80%" },
-  input: { borderBottomWidth: 1, marginBottom: 10, padding: 8 },
+  modalContent: { backgroundColor: "#fff", padding: 20, borderRadius: 15, width: "85%", shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 5 },
+  input: { borderBottomWidth: 1, marginBottom: 10, padding: 8, fontSize: 16 },
   suggestion: { padding: 10, borderBottomWidth: 1, borderBottomColor: "#ddd" },
-  button: { backgroundColor: "#007AFF", padding: 10, borderRadius: 5, marginTop: 10, alignItems: "center" },
-  buttonText: { color: "#fff", fontWeight: "bold" },
-  cancelText: { marginTop: 10, textAlign: "center", color: "red" },
+  button: { backgroundColor: "#007AFF", padding: 12, borderRadius: 10, alignItems: "center", marginTop: 10 },
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  cancelText: { marginTop: 10, textAlign: "center", color: "red", fontSize: 16 },
   errorText: { color: "red", fontSize: 14, textAlign: "center", marginTop: 10 },
 });

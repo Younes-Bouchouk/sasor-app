@@ -79,9 +79,9 @@ const ListItem = React.memo(({ item, viewableItems, router, getSportImage }) => 
         <Image source={{ uri: item.image || getSportImage(item.sport) }} style={styles.image} />
         <View style={styles.cardContent}>
           <Text style={styles.eventName}>{item.name}</Text>
-          <Text style={styles.sportType}>🏆 {item.sport}</Text>
-          <Text style={styles.location}>📍 {item.location}</Text>
-          <Text style={styles.participants}>👥 {item.maxParticipants} max</Text>
+          <Text style={styles.sportType}> {item.sport}</Text>
+          <Text style={styles.location}> {item.location}</Text>
+          <Text style={styles.participants}> {item.maxParticipants} Sasoriens max</Text>
         </View>
       </TouchableOpacity>
     </Animated.View>
