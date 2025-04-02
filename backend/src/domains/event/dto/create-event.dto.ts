@@ -20,7 +20,7 @@ export class CreateEventDto {
   location: string;
 
   @IsOptional()
-  @IsEnum(['PUBLIC', 'PRIVATE', 'FRIENDS-ONLY'])
+  @IsEnum(['PUBLIC', 'PRIVATE', 'FRIENDS'])
   visibility?: EventVisibility = 'PUBLIC';
 
   @Type(() => Date)
