@@ -7,7 +7,7 @@ import { useRouter } from "expo-router";
 import { useFetchQuery } from "../hooks/useFetchQuery";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import CreateEvent from "@/app/event/createEvent";
-
+import { getSportImage } from "@/utils/imageMapper";
 const { width } = Dimensions.get("window");
 
 export default function EventScreen() {
@@ -16,15 +16,6 @@ export default function EventScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const viewableItems = useSharedValue([]);
 
-  const getSportImage = (sport: string) => {
-    const sportImages = {
-      football: "https://i.ibb.co/rW4vqpn/Chat-GPT-Image-31-mars-2025-23-21-50.png",
-      basketball: "https://i.ibb.co/Zpk7xJbh/Chat-GPT-Image-31-mars-2025-23-23-03.png",
-      baseball: "https://i.ibb.co/sdz83t3q/Chat-GPT-Image-1-avr-2025-10-16-49.png",
-      default: "https://i.ibb.co/SwQk3MHz/logo-white-mini.png",
-    };
-    return sportImages[sport.toLowerCase()] || sportImages.default;
-  };
 
   if (isLoading) return <ActivityIndicator size="large" color="#18709E" style={styles.center} />;
   if (error) return <Text style={styles.errorText}>Erreur de chargement</Text>;

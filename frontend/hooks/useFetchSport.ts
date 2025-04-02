@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { sportsList } from "@/services/sportsList"; 
+import { sportsList } from "@/utils/sportsList"; 
 
 export function useFetchSports(query: string) {
   const [sports, setSports] = useState<string[]>([]);
