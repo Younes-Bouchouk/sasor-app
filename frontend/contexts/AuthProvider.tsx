@@ -1,8 +1,10 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { fetchAPI } from "@/services/api"; // Assure-toi d'avoir une fonction générique fetchAPI
 
 interface AuthContextType {
-  user: string | null;
+  userId: number | null;
+  user: any | null;
   token: string | null;
   login: (token: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -11,43 +13,56 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [token, setToken] = useState<string | null>(null);
 
-  //  Charger le token au démarrage
+  // Charger le token et l'utilisateur connecté
   useEffect(() => {
-    const loadToken = async () => {
+    const loadAuthData = async () => {
       const storedToken = await AsyncStorage.getItem("authToken");
       if (storedToken) {
         setToken(storedToken);
-        setUser("Utilisateur");
+        await fetchUserData(storedToken);
       }
     };
-    loadToken();
+    loadAuthData();
   }, []);
 
-  //  Sauvegarder le token lors du login
+  // Récupérer les infos de l'utilisateur connecté
+  const fetchUserData = async (authToken: string) => {
+    try {
+      const userData = await fetchAPI("/users/me", "GET", null, authToken);
+      setUserId(userData.id);
+      setUser(userData);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des données utilisateur", error);
+    }
+  };
+
+  // Sauvegarder le token et récupérer l'utilisateur
   const login = async (newToken: string) => {
     await AsyncStorage.setItem("authToken", newToken);
     setToken(newToken);
-    setUser("Utilisateur");
+    await fetchUserData(newToken);
   };
 
-  //  Supprimer le token lors du logout
+  // Déconnexion
   const logout = async () => {
     await AsyncStorage.removeItem("authToken");
     setToken(null);
+    setUserId(null);
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ userId, user, token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-//  Hook personnalisé pour accéder au contexte
+// Hook personnalisé pour accéder aux infos d'auth
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

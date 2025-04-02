@@ -22,15 +22,15 @@ export class EventService {
             data: {
                 participantId: userId,
                 eventId: newEvent.id,
-                canInvite: true
-            }
-        })
+                canInvite: true,
+            },
+        });
 
         return {
-            message: "Création terminé avec succès !",
+            message: 'Création terminé avec succès !',
             event: newEvent,
-            participant: newParticipant
-        }
+            participant: newParticipant,
+        };
     }
     /*
                           ! Récupérer tous les événements. */
@@ -121,10 +121,17 @@ export class EventService {
     /* 
                           !Supprimer un événement.*/
     async deleteEvent(eventId: number) {
+        // Étape 1: Supprimer les participants de l'événement
+        await this.prisma.eventParticipant.deleteMany({
+            where: { eventId: Number(eventId) },
+        });
+
+        // Étape 2: Supprimer l'événement
         return await this.prisma.event.delete({
             where: { id: Number(eventId) },
         });
     }
+
     /*
                           !Obtenir la liste des participants d'un événement.*/
     async getEventParticipants(eventId: number) {
@@ -143,7 +150,7 @@ export class EventService {
         });
 
         if (!event) {
-           return 'Événement introuvable.';
+            return 'Événement introuvable.';
         }
 
         // Vérifier si l'événement est PUBLIC
@@ -163,7 +170,7 @@ export class EventService {
         });
 
         if (!invitation) {
-            return 'Vous ne pouvez rejoindre cet événement que si vous êtes invité et que l\'invitation a été acceptée.';
+            return "Vous ne pouvez rejoindre cet événement que si vous êtes invité et que l'invitation a été acceptée.";
         }
 
         // Ajouter l'utilisateur à l'événement en tant que participant

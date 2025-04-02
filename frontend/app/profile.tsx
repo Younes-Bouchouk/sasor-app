@@ -20,7 +20,7 @@ export default function Profile() {
     await logout();
     navigation.reset({
       index: 0,
-      routes: [{ name: "Accueil" }], // Redirige vers l'accueil après logout
+      routes: [{ name: "event/event" }], // Redirige vers l'accueil après logout
     });
   };
 
@@ -28,7 +28,7 @@ export default function Profile() {
     return (
       <View style={styles.centered}>
         <Text style={styles.error}>Vous n'êtes pas connecté.</Text>
-        <Button title="Retour à l'accueil" onPress={() => navigation.navigate("index")} />
+        <Button title="veuillez vous connecter" onPress={() => navigation.navigate("login")} />
       </View>
     );
   }

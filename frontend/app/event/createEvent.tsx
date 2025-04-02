@@ -1,4 +1,4 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, FlatList, Animated } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, FlatList, Animated } from "react-native"; 
 import { useState, useRef } from "react";
 import { useCreateEvent } from "@/hooks/useCreateEvents";
 import { useFetchCities } from "@/hooks/useFetchCities";
@@ -12,9 +12,10 @@ interface CreateEventProps {
 export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
   const { mutate, isPending, isError, error } = useCreateEvent();
   const [currentStep, setCurrentStep] = useState(1);
-  const [query, setQuery] = useState("");
-  const { cities, loading: loadingCities } = useFetchCities(query);
-  const { sports, loading: loadingSports } = useFetchSports(query);
+  const [sportQuery, setSportQuery] = useState("");  // Sport query state
+  const [cityQuery, setCityQuery] = useState("");    // City query state
+  const { cities, loading: loadingCities } = useFetchCities(cityQuery);
+  const { sports, loading: loadingSports } = useFetchSports(sportQuery);
   const [eventData, setEventData] = useState({
     name: "",
     sport: "",
@@ -22,6 +23,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
     plannedAt: "",
     maxParticipants: "",
     visibility: "PUBLIC",
+    description: "",
   });
 
   const [errorMessage, setErrorMessage] = useState("");
@@ -32,6 +34,8 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
     if (currentStep === 2 && !eventData.sport) return "Le sport est requis !";
     if (currentStep === 3 && !eventData.location) return "Le lieu est requis !";
     if (currentStep === 4 && !eventData.plannedAt) return "La date est requise !";
+    if (currentStep === 5 && !eventData.visibility) return "Le statut de votre événement est requis !";
+    if (currentStep === 6 && !eventData.description) return "La description est requise !";
     return "";
   };
 
@@ -75,14 +79,12 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
     });
   };
 
-  function prevStep(event: GestureResponderEvent): void {
-    throw new Error("Function not implemented.");
-  }
-
   return (
     <View style={styles.modalContainer}>
       <Animated.View style={[styles.modalContent, { opacity: fadeAnim }]}> 
         <Text style={styles.modalTitle}>Créer un événement</Text>
+
+        {/* Étape 1: Nom */}
         {currentStep === 1 && (
           <>
             <TextInput
@@ -97,13 +99,14 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
           </>
         )}
 
+        {/* Étape 2: Sélection du sport */}
         {currentStep === 2 && (
           <>
             <TextInput
               placeholder="Sport"
               style={styles.input}
-              value={query}
-              onChangeText={setQuery}
+              value={sportQuery}  // Use sportQuery here
+              onChangeText={setSportQuery}  // Update sportQuery here
             />
             {loadingSports && <ActivityIndicator size="small" color="#007AFF" />}
             <FlatList
@@ -112,7 +115,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => {
                   setEventData({ ...eventData, sport: item });
-                  setQuery(item); // Met à jour la requête affichée
+                  setSportQuery(item); // Update sport query when selecting an item
                 }}>
                   <Text style={styles.suggestion}>{item}</Text>
                 </TouchableOpacity>
@@ -123,35 +126,40 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
             </TouchableOpacity>
           </>
         )}
-        {currentStep === 3 && (
-            <>
-              <TextInput
-                placeholder="Lieu"
-                style={styles.input}
-                value={eventData.location}
-                onChangeText={(text) => {
-                  setQuery(text);
-                  setEventData({ ...eventData, location: text });
-                }}
-              />
 
-              {/* Affichage des suggestions */}
-              {<ActivityIndicator size="small" color="#007AFF" />}
-              <FlatList
-                data={cities}
-                keyExtractor={(item) => item}
-                renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => setEventData({ ...eventData, location: item })}>
-                    <Text style={styles.suggestion}>{item}</Text>
-                  </TouchableOpacity>
-                )}
-              />
+        {/* Étape 3: Lieu */}
+{currentStep === 3 && (
+  <>
+    <TextInput
+      placeholder="Lieu"
+      style={styles.input}
+      value={eventData.location}  // Bind to eventData.location instead of cityQuery
+      onChangeText={(text) => {
+        setCityQuery(text);  // This updates the query for suggestions
+        setEventData({ ...eventData, location: text });  // This updates the location in eventData
+      }}
+    />
+    {loadingCities && <ActivityIndicator size="small" color="#007AFF" />}
+    <FlatList
+      data={cities}
+      keyExtractor={(item) => item}
+      renderItem={({ item }) => (
+        <TouchableOpacity
+          onPress={() => {
+            setEventData({ ...eventData, location: item });  // Update the location in eventData when selecting a city
+            setCityQuery(item);  // Optionally update the query to the selected city
+          }}
+        >
+          <Text style={styles.suggestion}>{item}</Text>
+        </TouchableOpacity>
+      )}
+    />
+    <TouchableOpacity style={styles.button} onPress={transitionToNextStep}>
+      <Text style={styles.buttonText}>Suivant</Text>
+    </TouchableOpacity>
+  </>
+)}
 
-              <TouchableOpacity style={styles.button} onPress={() => setCurrentStep(4)}>
-                <Text style={styles.buttonText}>Suivant</Text>
-              </TouchableOpacity>
-            </>
-          )}
 
         {/* Étape 4: Date */}
         {currentStep === 4 && (
@@ -162,27 +170,52 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               value={eventData.plannedAt}
               onChangeText={(text) => setEventData({ ...eventData, plannedAt: text })}
             />
-            <TouchableOpacity style={styles.button} onPress={submit}>
-              <Text style={styles.buttonText}>Créer</Text>
+            <TouchableOpacity style={styles.button} onPress={transitionToNextStep}>
+              <Text style={styles.buttonText}>Suivant</Text>
             </TouchableOpacity>
           </>
         )}
-         {/* Étape 5: visibilité */}
-         {currentStep === 4 && (
+
+        {/* Étape 5: Visibilité */}
+        {currentStep === 5 && (
+          <>
+            <Text style={styles.modalTitle}>Choisissez la visibilité</Text>
+            <View style={styles.visibilityOptions}>
+              {["PUBLIC", "PRIVATE", "FRIENDS"].map((visibility) => (
+                <TouchableOpacity
+                  key={visibility}
+                  style={[
+                    styles.visibilityButton,
+                    eventData.visibility === visibility && styles.selectedButton
+                  ]}
+                  onPress={() => setEventData({ ...eventData, visibility })}
+                >
+                  <Text style={styles.buttonText}>{visibility}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            <TouchableOpacity style={styles.button} onPress={transitionToNextStep}>
+              <Text style={styles.buttonText}>Suivant</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {/* Étape 6: Description */}
+        {currentStep === 6 && (
           <>
             <TextInput
-              placeholder="Date (YYYY-MM-DD)"
+              placeholder="Description de l'événement"
               style={styles.input}
-              value={eventData.plannedAt}
-              onChangeText={(text) => setEventData({ ...eventData, plannedAt: text })}
+              value={eventData.description}
+              onChangeText={(text) => setEventData({ ...eventData, description: text })}
             />
             <TouchableOpacity style={styles.button} onPress={submit}>
-              <Text style={styles.buttonText}>Créer</Text>
+              <Text style={styles.buttonText}>Créer l'événement</Text>
             </TouchableOpacity>
           </>
         )}
-        
 
+        {/* Affichage des messages */}
         {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
         {isError ? <Text style={styles.errorText}>{error?.message}</Text> : null}
         {isPending && <ActivityIndicator size="small" color="#007AFF" />}
@@ -192,9 +225,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
       </Animated.View>
     </View>
   );
-  
 }
-
 
 const styles = StyleSheet.create({
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
@@ -205,4 +236,13 @@ const styles = StyleSheet.create({
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
   cancelText: { marginTop: 10, textAlign: "center", color: "red", fontSize: 16 },
   errorText: { color: "red", fontSize: 14, textAlign: "center", marginTop: 10 },
+  visibilityOptions: { marginVertical: 10 },
+  visibilityButton: {
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 5,
+    marginVertical: 5,
+    alignItems: "center",
+  },
+  selectedButton: { backgroundColor: "#007AFF" },
 });

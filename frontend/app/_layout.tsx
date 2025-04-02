@@ -2,11 +2,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Tabs, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthProvider } from "../contexts/AuthProvider";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const queryClient = new QueryClient();
 
 export default function Layout() {
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
       <Tabs
@@ -14,10 +16,9 @@ export default function Layout() {
     headerShown: false,
     tabBarIcon: ({ color, size }) => {
       let iconName;
-      if (route.name === "index") iconName = "home-outline";
-      else if (route.name === "event/event") iconName = "calendar-outline";
+     if (route.name === "index") iconName = "calendar-outline";
       else if (route.name === "profile") iconName ="person-outline";
-
+      else if (route.name === "follow") iconName = "person-add-outline"
       return <Ionicons name={iconName} size={size} color={color} />;
     },
     tabBarActiveTintColor: "#18709E",
@@ -41,8 +42,7 @@ export default function Layout() {
   })}
 >
   {/* Onglets visibles */}
-  <Tabs.Screen name="index" options={{ title: "Accueil" }} />
-  <Tabs.Screen name="event" options={{ title: "Événements" }} />
+  <Tabs.Screen name="index" options={{ title: "Événements" }} />
   <Tabs.Screen name="profile" options={{title: "profil"}}/>
 
 
@@ -58,5 +58,7 @@ export default function Layout() {
 
       </QueryClientProvider>
     </AuthProvider>
+    </GestureHandlerRootView>
+
   );
 }

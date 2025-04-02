@@ -6,6 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useAuth } from "../contexts/AuthProvider";
 import { fetchAPI } from "../services/api";
+import { useNavigation } from "@react-navigation/native";
 
 //  Schéma de validation avec Yup
 const schema = yup.object({
@@ -29,7 +30,9 @@ const LoginScreen = () => {
   const [loginError, setLoginError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const navigation = useNavigation();
+  
+  
   //  Fonction de soumission du formulaire
   const onSubmit = async (data: FormData) => {
     setLoginError(""); // Reset des erreurs
@@ -117,6 +120,9 @@ const LoginScreen = () => {
 
       {/* Bouton de connexion */}
       <Button title={loading ? "Connexion..." : "Se connecter"} onPress={handleSubmit(onSubmit)} disabled={loading} />
+
+      <Button title="s'inscrire" onPress={() => navigation.navigate("register")} />
+      
     </View>
   );
 };
