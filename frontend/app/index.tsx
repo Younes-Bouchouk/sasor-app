@@ -4,7 +4,7 @@ import {
   StyleSheet, FlatList, Dimensions, Modal 
 } from "react-native";
 import { useRouter } from "expo-router";
-import { useFetchQuery } from "../../hooks/useFetchQuery";
+import { useFetchQuery } from "../hooks/useFetchQuery";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import CreateEvent from "@/app/event/createEvent";
 

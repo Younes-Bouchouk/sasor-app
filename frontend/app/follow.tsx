@@ -5,7 +5,7 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator }
 export default function FollowPage() {
   const { data: followers, isLoading: loadingFollowers, error: errorFollowers } = useFetchQuery(
     "follows",
-    "/follows/me/followers"
+    "/follows/me/following"
   );
 
   // Fonction pour récupérer le message d'erreur lisible
@@ -33,7 +33,7 @@ export default function FollowPage() {
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <View style={styles.listItem}>
-                <Text>{item.pseudo}</Text>
+                <Text>{item.followerId}</Text>
                 <TouchableOpacity
                   onPress={() => {} /* Ajouter la logique de "Ne plus suivre" ici */}
                   style={styles.button}

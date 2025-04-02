@@ -16,7 +16,7 @@ export default function Layout() {
     headerShown: false,
     tabBarIcon: ({ color, size }) => {
       let iconName;
-     if (route.name === "event/event") iconName = "calendar-outline";
+     if (route.name === "index") iconName = "calendar-outline";
       else if (route.name === "profile") iconName ="person-outline";
       else if (route.name === "follow") iconName = "person-add-outline"
       return <Ionicons name={iconName} size={size} color={color} />;
@@ -42,7 +42,7 @@ export default function Layout() {
   })}
 >
   {/* Onglets visibles */}
-  <Tabs.Screen name="event" options={{ title: "Événements" }} />
+  <Tabs.Screen name="index" options={{ title: "Événements" }} />
   <Tabs.Screen name="profile" options={{title: "profil"}}/>
 
 

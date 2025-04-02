@@ -57,7 +57,7 @@ export default function EventDetailsScreen() {
       <Text style={styles.participants}>👥 Participants max : {event.maxParticipants}</Text>
       <Text style={styles.description}>{event.description || "Aucune description disponible."}</Text>
 
-      <Button title="Retour" onPress={() => router.push({ pathname: "/event/event" })} />
+      <Button title="Retour" onPress={() => router.push({ pathname: "/" })} />
 
       {/* Bouton pour rejoindre l'événement */}
       <Button
