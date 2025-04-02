@@ -10,6 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useState } from "react";
+import {getSportImage} from "@/utils/imageMapper" 
 
 export default function EventDetailsScreen() {
   const { id } = useLocalSearchParams();
@@ -17,7 +18,9 @@ export default function EventDetailsScreen() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [modalVisible, setModalVisible] = useState(false);
-
+  
+  
+  
   if (!id) return <Text style={styles.errorText}>Erreur : ID d'événement invalide</Text>;
 
   const { data: event, isLoading, error } = useFetchQuery(`event-${id}`, `/events/${id}`);
@@ -45,9 +48,10 @@ export default function EventDetailsScreen() {
     <View style={styles.container}>
       {/* Image de l'événement */}
       <Image 
-        source={{ uri: event.image || "https://i.ibb.co/SwQk3MHz/logo-white-mini.png" }}
-        style={styles.image}
-      />
+  source={{ uri: event.image || getSportImage(event.sport) }} 
+  style={styles.image} 
+/>
+
       
       {/* Contenu de l'événement */}
       <View style={styles.detailsContainer}>
