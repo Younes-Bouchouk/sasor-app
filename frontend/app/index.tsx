@@ -62,8 +62,13 @@ export default function EventScreen() {
             getSportImage={getSportImage}
             isOwner={myEvents?.some((e) => e.id === item.id)}
             refetch={refetch}
+            viewableItems={viewableItems}
           />
         )}
+        onViewableItemsChanged={({ viewableItems: vItems }) => {
+          viewableItems.value = vItems;
+        }}
+        viewabilityConfig={{ viewAreaCoveragePercentThreshold: 50 }}
       />
 
       <TouchableOpacity
@@ -85,7 +90,7 @@ export default function EventScreen() {
 }
 
 const ListItem = React.memo(
-  ({ item, router, getSportImage, isOwner, refetch }) => {
+  ({ item, router, getSportImage, isOwner, refetch, viewableItems }) => {
     const { token } = useAuth();
 
     const handleDelete = async () => {
@@ -99,15 +104,8 @@ const ListItem = React.memo(
             style: "destructive",
             onPress: async () => {
               try {
-                const response = await fetchAPI(
-                  `/events/${item.id}`,
-                  "DELETE",
-                  {},
-                  token || undefined
-                );
-                console.log("Réponse de l'API :", response);
+                await fetchAPI(`/events/${item.id}`, "DELETE", {}, token || undefined);
                 await refetch();
-                return response;
               } catch (error) {
                 console.error("Erreur lors de l'exclusion:", error);
               }
@@ -117,10 +115,15 @@ const ListItem = React.memo(
       );
     };
 
-    const rStyle = useAnimatedStyle(() => ({
-      opacity: withTiming(1),
-      transform: [{ scale: withTiming(1) }],
-    }));
+    const rStyle = useAnimatedStyle(() => {
+      const isVisible = viewableItems.value.some(
+        (viewableItem) => viewableItem.item.id === item.id
+      );
+      return {
+        opacity: withTiming(isVisible ? 5 : 0.5),
+        transform: [{ scale: withTiming(isVisible ? 1 : 0.8) }],
+      };
+    });
 
     return (
       <Swipeable
@@ -151,7 +154,6 @@ const ListItem = React.memo(
               <Text style={styles.sportType}> {item.sport}</Text>
               <Text style={styles.location}> {item.location}</Text>
               <Text style={styles.participants}>
-                {" "}
                 {item.maxParticipants} Sasoriens max
               </Text>
             </View>
@@ -166,6 +168,7 @@ const ListItem = React.memo(
     );
   }
 );
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F8F9FA", paddingTop: 10 },
