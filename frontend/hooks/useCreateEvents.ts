@@ -32,6 +32,7 @@ export function useCreateEvent() {
       console.log("✅ Données envoyées :", cleanEventData);
 
       return fetchAPI("/events", "POST", cleanEventData, token);
+      
     },
     onSuccess: () => {
       console.log(" Événement créé avec succès !");

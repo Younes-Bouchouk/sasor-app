@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useState } from "react";
 import {getSportImage} from "@/utils/imageMapper" 
+import { ScrollView } from "react-native-gesture-handler";
 
 export default function EventDetailsScreen() {
   const { id } = useLocalSearchParams();
@@ -46,15 +47,16 @@ export default function EventDetailsScreen() {
 
   return (
     <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
       {/* Image de l'événement */}
       <Image 
-  source={{ uri: event.image || getSportImage(event.sport) }} 
-  style={styles.image} 
-/>
+        source={{ uri: event.image || getSportImage(event.sport) }} 
+        style={styles.image} 
+      />
 
       
       {/* Contenu de l'événement */}
-      <View style={styles.detailsContainer}>
+      <ScrollView style={styles.detailsContainer}>
         <Text style={styles.title}>{event.name}</Text>
         <Text style={styles.sportType}>Sport : {event.sport}</Text>
         <Text style={styles.date}>
@@ -106,13 +108,14 @@ export default function EventDetailsScreen() {
             </View>
           </View>
         </Modal>
-      </View>
+      </ScrollView>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1,  },
+  container: { flex: 1  },
   image: { width: "100%", height: 350, resizeMode: "cover" },
   detailsContainer: { padding: 20 },
   title: { fontSize: 26, fontWeight: "bold", marginBottom: 10 },
@@ -120,6 +123,7 @@ const styles = StyleSheet.create({
   date: { fontSize: 16, color: "#EEEEEE", marginBottom: 5 },
   location: { fontSize: 16, marginBottom: 5 },
   participants: { fontSize: 16, color: "#E74C3C", marginBottom: 10 },
+  scrollContainer: { paddingBottom: 100 },
   description: { fontSize: 14, textAlign: "center" },
   buttonContainer: { flexDirection: "row", justifyContent: "space-between", marginVertical: 15 },
   joinButton: { backgroundColor: "#18709E", padding: 12, borderRadius: 8, flex: 1, marginRight: 10 },

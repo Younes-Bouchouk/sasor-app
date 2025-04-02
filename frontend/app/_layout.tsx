@@ -44,6 +44,7 @@ export default function Layout() {
   {/* Onglets visibles */}
   <Tabs.Screen name="index" options={{ title: "Événements" }} />
   <Tabs.Screen name="profile" options={{title: "profil"}}/>
+  <Tabs.Screen name="follow" options={{title: "abonnement"}}/>
 
 
 
