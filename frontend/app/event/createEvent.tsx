@@ -12,8 +12,8 @@ interface CreateEventProps {
 export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
   const { mutate, isPending, isError, error } = useCreateEvent();
   const [currentStep, setCurrentStep] = useState(1);
-  const [sportQuery, setSportQuery] = useState("");  // Sport query state
-  const [cityQuery, setCityQuery] = useState("");    // City query state
+  const [sportQuery, setSportQuery] = useState("");  
+  const [cityQuery, setCityQuery] = useState("");   
   const { cities, loading: loadingCities } = useFetchCities(cityQuery);
   const { sports, loading: loadingSports } = useFetchSports(sportQuery);
   const [eventData, setEventData] = useState({
@@ -105,8 +105,8 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
             <TextInput
               placeholder="Sport"
               style={styles.input}
-              value={sportQuery}  // Use sportQuery here
-              onChangeText={setSportQuery}  // Update sportQuery here
+              value={sportQuery}  
+              onChangeText={setSportQuery}  
             />
             {loadingSports && <ActivityIndicator size="small" color="#007AFF" />}
             <FlatList
@@ -115,7 +115,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => {
                   setEventData({ ...eventData, sport: item });
-                  setSportQuery(item); // Update sport query when selecting an item
+                  setSportQuery(item); 
                 }}>
                   <Text style={styles.suggestion}>{item}</Text>
                 </TouchableOpacity>
@@ -133,10 +133,10 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
     <TextInput
       placeholder="Lieu"
       style={styles.input}
-      value={eventData.location}  // Bind to eventData.location instead of cityQuery
+      value={eventData.location}
       onChangeText={(text) => {
-        setCityQuery(text);  // This updates the query for suggestions
-        setEventData({ ...eventData, location: text });  // This updates the location in eventData
+        setCityQuery(text);  
+        setEventData({ ...eventData, location: text });  
       }}
     />
     {loadingCities && <ActivityIndicator size="small" color="#007AFF" />}
@@ -146,8 +146,8 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
       renderItem={({ item }) => (
         <TouchableOpacity
           onPress={() => {
-            setEventData({ ...eventData, location: item });  // Update the location in eventData when selecting a city
-            setCityQuery(item);  // Optionally update the query to the selected city
+            setEventData({ ...eventData, location: item });  
+            setCityQuery(item);
           }}
         >
           <Text style={styles.suggestion}>{item}</Text>

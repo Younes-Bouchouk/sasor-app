@@ -1,0 +1,47 @@
+{
+  "terminal.integrated.profiles.windows": {
+    "Backend": {
+      "path": "C:\\Windows\\System32\\cmd.exe",
+      "args": ["/k", "cd C:\\Users\\azpic\\OneDrive\\Documents\\sasor-app\\backend && npm run dev"]
+    },
+    "Frontend": {
+      "path": "C:\\Windows\\System32\\cmd.exe",
+      "args": ["/k", "cd C:\\Users\\azpic\\OneDrive\\Documents\\sasor-app\\frontend && npm run dev"]
+    },
+    "Studio": {
+      "path": "C:\\Windows\\System32\\cmd.exe",
+      "args": ["/k", "cd C:\\Users\\azpic\\OneDrive\\Documents\\sasor-app\\backend && npx prisma studio"]
+    },
+    "General": {
+      "path": "C:\\Windows\\System32\\cmd.exe",
+      "args": ["/k", "cd C:\\Users\\azpic\\OneDrive\\Documents\\sasor-app"]
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "General",
+
+  "workbench.startupEditor": "none",
+  "workbench.action.terminal.focus": true,
+
+  "auto-run-command.rules": [
+    {
+      "condition": "always",
+      "command": "workbench.action.terminal.newWithProfile",
+      "args": { "profile": "Backend" }
+    },
+    {
+      "condition": "always",
+      "command": "workbench.action.terminal.newWithProfile",
+      "args": { "profile": "Frontend" }
+    },
+    {
+      "condition": "always",
+      "command": "workbench.action.terminal.newWithProfile",
+      "args": { "profile": "Studio" }
+    },
+    {
+      "condition": "always",
+      "command": "workbench.action.terminal.newWithProfile",
+      "args": { "profile": "General" }
+    }
+  ]
+}
