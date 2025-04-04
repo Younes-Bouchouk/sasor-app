@@ -1,6 +1,8 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchAPI } from "@/services/api"; // Assure-toi d'avoir une fonction générique fetchAPI
+import { router } from "expo-router";
+import { QueryClient } from "@tanstack/react-query";
 
 interface AuthContextType {
   userId: number | null;
@@ -11,7 +13,7 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
-
+const queryClient = new QueryClient();
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useState<number | null>(null);
   const [user, setUser] = useState<any | null>(null);
@@ -30,9 +32,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // Récupérer les infos de l'utilisateur connecté
-  const fetchUserData = async (authToken: string) => {
+  const fetchUserData = async (authToken: any) => {
     try {
-      const userData = await fetchAPI("/users/me", "GET", null, authToken);
+      const userData = await fetchAPI("/users/me", "GET", null, authToken );
       setUserId(userData.id);
       setUser(userData);
     } catch (error) {
@@ -53,6 +55,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setToken(null);
     setUserId(null);
     setUser(null);
+    queryClient.clear(); 
+    router.replace("/login");
   };
 
   return (

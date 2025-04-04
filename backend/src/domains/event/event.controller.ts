@@ -16,11 +16,11 @@ export class EventController {
     return this.eventService.createEvent(req.user.id, createEventDto);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
-  getAll(@Req() req : AuthenticatedRequest) {
-    return this.eventService.getAllEvents(req.user.id);
-  }
+getAll() {
+  return this.eventService.getAllEvents();
+}
+
 
   @UseGuards(JwtAuthGuard)
   @Get('me')

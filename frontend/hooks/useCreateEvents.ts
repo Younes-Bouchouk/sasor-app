@@ -1,9 +1,18 @@
 import { useMutation } from "@tanstack/react-query";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { fetchAPI } from "../services/api";
+interface EventData {
+  name: string;
+  sport: string;
+  location: string;
+  plannedAt: string;
+  maxParticipants:   string;
+  visibility: "PUBLIC" | "PRIVATE" | "FRIENDS";
+  description: string;
+}
 
 export function useCreateEvent() {
-  return useMutation({
+  return useMutation<EventData, Error, EventData>({
     mutationFn: async (eventData) => {
       console.log("📤 Tentative de création de l'événement...");
 
@@ -12,7 +21,7 @@ export function useCreateEvent() {
       if (!token) {
         throw new Error(" Aucun token trouvé, veuillez vous reconnecter.");
       }
-// Vérifier et formater la date
+      // Vérifier et formater la date
       if (!eventData.plannedAt || typeof eventData.plannedAt !== "string") {
         throw new Error(" Date invalide ou manquante !");
       }
@@ -31,8 +40,7 @@ export function useCreateEvent() {
 
       console.log("✅ Données envoyées :", cleanEventData);
 
-      return fetchAPI("/events", "POST", cleanEventData, token);
-      
+      return fetchAPI("/events", "POST", token, cleanEventData);
     },
     onSuccess: () => {
       console.log(" Événement créé avec succès !");

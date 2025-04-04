@@ -19,6 +19,9 @@ export default function EventDetailsScreen() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [modalVisible, setModalVisible] = useState(false);
+  const isValidDate = (d: any) => {
+    return d instanceof Date && !isNaN(d.getTime());
+  };
   
   
   
@@ -60,8 +63,11 @@ export default function EventDetailsScreen() {
         <Text style={styles.title}>{event.name}</Text>
         <Text style={styles.sportType}>Sport : {event.sport}</Text>
         <Text style={styles.date}>
-          {format(new Date(event.plannedAt), "dd MMMM yyyy", { locale: fr })}
-        </Text>
+        {isValidDate(new Date(event.plannedAt))
+          ? format(new Date(event.plannedAt), "dd MMMM yyyy", { locale: fr })
+          : "Date inconnue"}
+      </Text>
+
         <Text style={styles.location}>Lieu : {event.location}</Text>
         <Text style={styles.participants}>Participants max : {event.maxParticipants}</Text>
         <Text style={styles.description}>{event.description || "Aucune description disponible."}</Text>
@@ -96,8 +102,11 @@ export default function EventDetailsScreen() {
                     <View style={styles.participantItem}>
                       <Text style={styles.participantName}>{item.participant.pseudo}</Text>
                       <Text style={styles.joinedAt}>
-                        {format(new Date(item.joinedAt), "dd MMMM yyyy à HH:mm", { locale: fr })}
-                      </Text>
+                      {isValidDate(new Date(event.plannedAt))
+                        ? format(new Date(event.plannedAt), "dd MMMM yyyy", { locale: fr })
+                        : "Date inconnue"}
+                    </Text>
+
                     </View>
                   )}
                 />

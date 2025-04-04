@@ -3,10 +3,23 @@ import { useState, useRef } from "react";
 import { useCreateEvent } from "@/hooks/useCreateEvents";
 import { useFetchCities } from "@/hooks/useFetchCities";
 import { useFetchSports } from "@/hooks/useFetchSport";
+import { RefetchOptions } from "@tanstack/react-query";
+
+// Définir un type pour les données de l'événement
+interface EventData {
+  name: string;
+  sport: string;
+  location: string;
+  plannedAt: string;
+  maxParticipants: number;
+  visibility: string;
+  description: string;
+}
 
 interface CreateEventProps {
   onClose: () => void;
-  refetch: () => void;
+  refetch: (options?: RefetchOptions) => Promise<any>;
+  refetchMyEvents: (options?: RefetchOptions) => Promise<any>;
 }
 
 export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
@@ -16,12 +29,14 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
   const [cityQuery, setCityQuery] = useState("");   
   const { cities, loading: loadingCities } = useFetchCities(cityQuery);
   const { sports, loading: loadingSports } = useFetchSports(sportQuery);
-  const [eventData, setEventData] = useState({
+  
+  // Initialisation des données de l'événement avec le bon type
+  const [eventData, setEventData] = useState<EventData>({
     name: "",
     sport: "",
     location: "",
     plannedAt: "",
-    maxParticipants: "",
+    maxParticipants: 0,
     visibility: "PUBLIC",
     description: "",
   });
@@ -67,7 +82,13 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
       return;
     }
 
-    const formData = { ...eventData, maxParticipants: parseInt(eventData.maxParticipants, 10) };
+    // Créer un objet formData avec les données de l'événement
+    const formData: EventData = { 
+      ...eventData, 
+      maxParticipants: parseInt(eventData.maxParticipants.toString(), 10) 
+    };
+
+    // Désactiver le bouton pendant la soumission
     mutate(formData, {
       onSuccess: () => {
         refetch();
@@ -93,7 +114,11 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               value={eventData.name}
               onChangeText={(text) => setEventData({ ...eventData, name: text })}
             />
-            <TouchableOpacity style={styles.button} onPress={transitionToNextStep}>
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={transitionToNextStep}
+              disabled={isPending} // Désactive le bouton si une requête est en cours
+            >
               <Text style={styles.buttonText}>Suivant</Text>
             </TouchableOpacity>
           </>
@@ -121,45 +146,52 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
                 </TouchableOpacity>
               )}
             />
-            <TouchableOpacity style={styles.button} onPress={transitionToNextStep}>
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={transitionToNextStep}
+              disabled={isPending}
+            >
               <Text style={styles.buttonText}>Suivant</Text>
             </TouchableOpacity>
           </>
         )}
 
         {/* Étape 3: Lieu */}
-{currentStep === 3 && (
-  <>
-    <TextInput
-      placeholder="Lieu"
-      style={styles.input}
-      value={eventData.location}
-      onChangeText={(text) => {
-        setCityQuery(text);  
-        setEventData({ ...eventData, location: text });  
-      }}
-    />
-    {loadingCities && <ActivityIndicator size="small" color="#007AFF" />}
-    <FlatList
-      data={cities}
-      keyExtractor={(item) => item}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          onPress={() => {
-            setEventData({ ...eventData, location: item });  
-            setCityQuery(item);
-          }}
-        >
-          <Text style={styles.suggestion}>{item}</Text>
-        </TouchableOpacity>
-      )}
-    />
-    <TouchableOpacity style={styles.button} onPress={transitionToNextStep}>
-      <Text style={styles.buttonText}>Suivant</Text>
-    </TouchableOpacity>
-  </>
-)}
-
+        {currentStep === 3 && (
+          <>
+            <TextInput
+              placeholder="Lieu"
+              style={styles.input}
+              value={eventData.location}
+              onChangeText={(text) => {
+                setCityQuery(text);  
+                setEventData({ ...eventData, location: text });  
+              }}
+            />
+            {loadingCities && <ActivityIndicator size="small" color="#007AFF" />}
+            <FlatList
+              data={cities}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    setEventData({ ...eventData, location: item });  
+                    setCityQuery(item);
+                  }}
+                >
+                  <Text style={styles.suggestion}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={transitionToNextStep}
+              disabled={isPending}
+            >
+              <Text style={styles.buttonText}>Suivant</Text>
+            </TouchableOpacity>
+          </>
+        )}
 
         {/* Étape 4: Date */}
         {currentStep === 4 && (
@@ -170,7 +202,11 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               value={eventData.plannedAt}
               onChangeText={(text) => setEventData({ ...eventData, plannedAt: text })}
             />
-            <TouchableOpacity style={styles.button} onPress={transitionToNextStep}>
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={transitionToNextStep}
+              disabled={isPending}
+            >
               <Text style={styles.buttonText}>Suivant</Text>
             </TouchableOpacity>
           </>
@@ -184,17 +220,18 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               {["PUBLIC", "PRIVATE", "FRIENDS"].map((visibility) => (
                 <TouchableOpacity
                   key={visibility}
-                  style={[
-                    styles.visibilityButton,
-                    eventData.visibility === visibility && styles.selectedButton
-                  ]}
+                  style={[styles.visibilityButton, eventData.visibility === visibility && styles.selectedButton]}
                   onPress={() => setEventData({ ...eventData, visibility })}
                 >
                   <Text style={styles.buttonText}>{visibility}</Text>
                 </TouchableOpacity>
               ))}
             </View>
-            <TouchableOpacity style={styles.button} onPress={transitionToNextStep}>
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={transitionToNextStep}
+              disabled={isPending}
+            >
               <Text style={styles.buttonText}>Suivant</Text>
             </TouchableOpacity>
           </>
@@ -209,7 +246,11 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               value={eventData.description}
               onChangeText={(text) => setEventData({ ...eventData, description: text })}
             />
-            <TouchableOpacity style={styles.button} onPress={submit}>
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={submit}
+              disabled={isPending} // Désactive le bouton de soumission si une requête est en cours
+            >
               <Text style={styles.buttonText}>Créer l'événement</Text>
             </TouchableOpacity>
           </>
@@ -227,9 +268,11 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
   );
 }
 
+
 const styles = StyleSheet.create({
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
   modalContent: { backgroundColor: "#fff", padding: 20, borderRadius: 15, width: "85%", shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 5 },
+  modalTitle: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 15 },
   input: { borderBottomWidth: 1, marginBottom: 10, padding: 8, fontSize: 16 },
   suggestion: { padding: 10, borderBottomWidth: 1, borderBottomColor: "#ddd" },
   button: { backgroundColor: "#007AFF", padding: 12, borderRadius: 10, alignItems: "center", marginTop: 10 },
@@ -246,3 +289,4 @@ const styles = StyleSheet.create({
   },
   selectedButton: { backgroundColor: "#007AFF" },
 });
+

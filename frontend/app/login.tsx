@@ -40,7 +40,7 @@ const LoginScreen = () => {
 
     try {
       //  Appel API propre avec la fonction centralisée `fetchAPI`
-      const result = await fetchAPI("/auth/login", "POST", data);
+      const result = await fetchAPI("/auth/login", "POST",null ,data );
 
       if (!result.access_token) {
         setLoginError("Email ou mot de passe incorrect.");
@@ -50,7 +50,7 @@ const LoginScreen = () => {
 
       //  Stockage du token et redirection
       await login(result.access_token);
-      router.push("/event/event"); 
+      router.push("/"); 
       
     } catch (error) {
       console.error("Erreur de connexion :", error);
@@ -121,7 +121,7 @@ const LoginScreen = () => {
       {/* Bouton de connexion */}
       <Button title={loading ? "Connexion..." : "Se connecter"} onPress={handleSubmit(onSubmit)} disabled={loading} />
 
-      <Button title="s'inscrire" onPress={() => navigation.navigate("register")} />
+      <Button title="s'inscrire" onPress={() => router.push("/register")} />
       
     </View>
   );

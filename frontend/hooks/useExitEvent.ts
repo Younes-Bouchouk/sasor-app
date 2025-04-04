@@ -9,7 +9,7 @@ export function useExitEvent() {
     console.log(`Tentative de quitter l'événement ${eventId}...`);
     
     try {
-      const response = await fetchAPI(`/events/${eventId}/exit`, "DELETE", {}, token || undefined);
+      const response = await fetchAPI(`/events/${eventId}/exit`, "DELETE",  token,{} );
       console.log("Réponse de l'API :", response);
       return response;
     } catch (error) {

@@ -9,7 +9,7 @@ export function useJoinEvent() {
     console.log(`Tentative de rejoindre l'événement ${eventId}...`);
     
     try {
-      const response = await fetchAPI(`/events/${eventId}/join`, "POST", {}, token || undefined);
+      const response = await fetchAPI(`/events/${eventId}/join`, "POST",  token,{} );
       console.log("Réponse de l'API :", response);
       return response;
     } catch (error) {

@@ -1,12 +1,18 @@
+import { useAuth } from "@/contexts/AuthProvider";
 import { useFetchQuery } from "@/hooks/useFetchQuery";
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 
 export default function FollowPage() {
-  const { data: followers, isLoading: loadingFollowers, error: errorFollowers } = useFetchQuery(
+  const { data: followers, isLoading: loadingFollowers, error: errorFollowers,refetch } = useFetchQuery(
     "follows",
     "/follows/me/following"
   );
+  // Réexécuter la requête quand l'utilisateur change (utile après connexion/déconnexion)
+    const { token, logout } = useAuth();
+    useEffect(() => {
+      refetch();
+    }, [token]);
 
   // Fonction pour récupérer le message d'erreur lisible
   const getErrorMessage = (error: any) => {

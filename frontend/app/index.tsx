@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   Dimensions,
   Modal,
   Alert,
+  ViewToken,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { useFetchQuery } from "../hooks/useFetchQuery";
@@ -27,6 +28,25 @@ import { useAuth } from "@/contexts/AuthProvider";
 
 const { width } = Dimensions.get("window");
 
+// 1. Définir les types pour les props de ListItem
+interface EventItem {
+  id: number;
+  name: string;
+  sport: string;
+  location: string;
+  maxParticipants: number;
+  image?: string;
+}
+
+interface ListItemProps {
+  item: EventItem;
+  router: any; 
+  getSportImage: (sport: string | undefined) => any;
+  isOwner: boolean;
+  refetch: () => Promise<any>;
+  viewableItems: any;
+}
+
 export default function EventScreen() {
   const router = useRouter();
   const {
@@ -39,8 +59,16 @@ export default function EventScreen() {
     "myEvents",
     "/events/me"
   );
+  // Réexécuter la requête quand l'utilisateur change (utile après connexion/déconnexion)
+  const { token, logout } = useAuth();
+  useEffect(() => {
+    refetch();
+    refetchMyEvents();
+  }, [token]);
+  
   const [modalVisible, setModalVisible] = useState(false);
-  const viewableItems = useSharedValue([]);
+  const viewableItems = useSharedValue<ViewToken<any>[]>([]);
+  
 
   if (isLoading)
     return (
@@ -60,7 +88,7 @@ export default function EventScreen() {
             item={item}
             router={router}
             getSportImage={getSportImage}
-            isOwner={myEvents?.some((e) => e.id === item.id)}
+            isOwner={Array.isArray(myEvents) && myEvents.some((e) => e.id === item.id)}
             refetch={refetch}
             viewableItems={viewableItems}
           />
@@ -89,11 +117,18 @@ export default function EventScreen() {
   );
 }
 
+// 2. Composant ListItem avec les types définis
 const ListItem = React.memo(
-  ({ item, router, getSportImage, isOwner, refetch, viewableItems }) => {
-    const { token } = useAuth();
+  ({ item, router, getSportImage, isOwner, refetch, viewableItems }: ListItemProps) => {
+    const { token } = useAuth(); // Utilisation du token pour la suppression
 
     const handleDelete = async () => {
+      // Si l'utilisateur n'est pas le propriétaire, il ne peut pas supprimer l'événement
+      if (!isOwner) {
+        Alert.alert("Erreur", "Vous ne pouvez supprimer que vos propres événements.");
+        return;
+      }
+
       Alert.alert(
         "Supprimer l'événement",
         "Voulez-vous vraiment supprimer cet événement ?",
@@ -104,10 +139,12 @@ const ListItem = React.memo(
             style: "destructive",
             onPress: async () => {
               try {
-                await fetchAPI(`/events/${item.id}`, "DELETE", {}, token || undefined);
-                await refetch();
+                // Suppression de l'événement via l'API avec vérification du token
+                await fetchAPI(`/events/${item.id}`, "DELETE", token, {});
+                await refetch(); 
               } catch (error) {
-                console.error("Erreur lors de l'exclusion:", error);
+                console.error("Erreur lors de la suppression de l'événement:", error);
+                Alert.alert("Erreur", "Une erreur s'est produite lors de la suppression.");
               }
             },
           },
@@ -117,17 +154,17 @@ const ListItem = React.memo(
 
     const rStyle = useAnimatedStyle(() => {
       const isVisible = viewableItems.value.some(
-        (viewableItem) => viewableItem.item.id === item.id
+        (viewableItem: { item: { id: any; }; }) => viewableItem.item.id === item.id
       );
       return {
-        opacity: withTiming(isVisible ? 5 : 0.5),
+        opacity: withTiming(isVisible ? 1 : 0.5),
         transform: [{ scale: withTiming(isVisible ? 1 : 0.8) }],
       };
     });
 
     return (
       <Swipeable
-        enabled={isOwner}
+        enabled={isOwner} // Swipeable n'est activé que si l'utilisateur est le propriétaire
         renderRightActions={() => (
           <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
             <Ionicons name="trash" size={24} color="white" />
@@ -238,4 +275,4 @@ const styles = StyleSheet.create({
   floatingButtonText: { color: "#fff", fontSize: 30, fontWeight: "bold" },
 });
 
-export default EventScreen;
+export { ListItem }; // exportation nommée de ListItem

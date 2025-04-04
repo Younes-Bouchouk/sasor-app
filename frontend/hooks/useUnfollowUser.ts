@@ -3,8 +3,8 @@ import { fetchAPI } from "../services/api";
 
 export function useUnfollowUser() {
   return useMutation({
-    mutationFn: async (followingId: number) => {
-      return fetchAPI("/follows/me", "DELETE", { followingId });
+    mutationFn: async (followingId: number ) => {
+      return fetchAPI("/follows/me", "DELETE", null,{ followingId });
     },
     onSuccess: () => {
       // Logique après la suppression, par exemple, rafraîchir la liste des abonnements

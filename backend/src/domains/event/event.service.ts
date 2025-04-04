@@ -34,7 +34,7 @@ export class EventService {
     }
     /*
                           ! Récupérer tous les événements. */
-    async getAllEvents(userId: number) {
+    async getAllEvents(userId?: number) {
         //retourne toutes les lignes de la table event.
         const allEvents = await this.prisma.event.findMany({
             where: {

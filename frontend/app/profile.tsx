@@ -18,10 +18,6 @@ export default function Profile() {
 
   const handleLogout = async () => {
     await logout();
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "event/event" }], // Redirige vers l'accueil après logout
-    });
   };
 
   if (!token) {
