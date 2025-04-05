@@ -56,10 +56,22 @@ export default function Profile() {
         <Text style={styles.value}>{profile.pseudo}</Text>
 
         <Text style={styles.label}>🎂 Anniversaire:</Text>
-        <Text style={styles.value}>{profile.birthday}</Text>
+        <Text style={styles.value}>
+            {new Date(profile.birthday).toLocaleDateString("fr-FR", {
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            })}
+        </Text>
 
         <Text style={styles.label}>📅 Créé le:</Text>
-        <Text style={styles.value}>{profile.createdAt}</Text>
+        <Text style={styles.value}>
+            {new Date(profile.createdAt).toLocaleDateString("fr-FR", {
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            })}
+        </Text>
       </View>
 
       <Button title="Se Déconnecter" onPress={handleLogout} color="#E74C3C" />

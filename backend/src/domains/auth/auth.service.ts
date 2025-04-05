@@ -41,7 +41,7 @@ export class AuthService {
                 pseudo,
                 email,
                 password: hashedPassword,
-                birthday,
+                birthday: new Date(birthday),
             }
         });
 
