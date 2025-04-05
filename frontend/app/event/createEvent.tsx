@@ -4,6 +4,8 @@ import { useCreateEvent } from "@/hooks/useCreateEvents";
 import { useFetchCities } from "@/hooks/useFetchCities";
 import { useFetchSports } from "@/hooks/useFetchSport";
 import { RefetchOptions } from "@tanstack/react-query";
+import React from "react";
+import { DatePicker } from "@/components/ui/DatePicker";
 
 // Définir un type pour les données de l'événement
 interface EventData {
@@ -201,6 +203,10 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               style={styles.input}
               value={eventData.plannedAt}
               onChangeText={(text) => setEventData({ ...eventData, plannedAt: text })}
+            />
+            <DatePicker
+                value={eventData.plannedAt}
+                onChange={(text) => setEventData({...eventData, plannedAt: text})}
             />
             <TouchableOpacity 
               style={styles.button} 
