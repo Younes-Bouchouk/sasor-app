@@ -3,6 +3,7 @@ import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthProvider } from "../contexts/AuthProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import React from "react";
 
 const queryClient = new QueryClient();
 

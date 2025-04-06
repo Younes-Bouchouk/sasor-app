@@ -7,6 +7,7 @@ import * as yup from "yup";
 import { useAuth } from "../contexts/AuthProvider";
 import { fetchAPI } from "../services/api";
 import { useNavigation } from "@react-navigation/native";
+import React from "react";
 
 //  Schéma de validation avec Yup
 const schema = yup.object({
