@@ -12,6 +12,7 @@ import { fr } from "date-fns/locale";
 import { useState } from "react";
 import {getSportImage} from "@/utils/imageMapper" 
 import { ScrollView } from "react-native-gesture-handler";
+import React from "react";
 
 export default function EventDetailsScreen() {
   const { id } = useLocalSearchParams();

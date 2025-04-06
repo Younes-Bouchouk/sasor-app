@@ -11,7 +11,7 @@ export default function FollowPage() {
   // Réexécuter la requête quand l'utilisateur change (utile après connexion/déconnexion)
     const { token, logout } = useAuth();
     useEffect(() => {
-      refetch();
+      refetch(); 
     }, [token]);
 
   // Fonction pour récupérer le message d'erreur lisible

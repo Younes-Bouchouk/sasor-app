@@ -1,6 +1,6 @@
-export const API_BASE_URL = "http://192.168.1.86:4000";
+export const API_BASE_URL = "http://192.168.1.216:4000";
 
-export const fetchAPI = async (path: string, method: strming = "GET", token?: string | null, body?: object) => {
+export const fetchAPI = async (path: string, method: string = "GET", token?: string | null, body?: object) => {
   try {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
