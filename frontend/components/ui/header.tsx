@@ -1,23 +1,30 @@
 import React from "react";
 import { View, TouchableOpacity, Image, StyleSheet, Platform, StatusBar } from "react-native";
-import { useRouter } from "expo-router";
-import { useAuth } from "@/contexts/AuthProvider"; // Importer le contexte AuthProvider
+import { useRouter, useSegments } from "expo-router";
+import { useAuth } from "@/contexts/AuthProvider";
 
 export default function Header() {
   const router = useRouter();
-  const { user } = useAuth(); // Récupérer les informations utilisateur depuis le contexte
+  const segments = useSegments(); // Récupère les segments de la route actuelle
+  const { user } = useAuth();
 
   // Définir l'image de profil ou une image par défaut
   const profileImage = user?.image || "https://i.ibb.co/SwQk3MHz/logo-white-mini.png";
 
-  console.log("Image de profil utilisée :", profileImage); // Vérifiez l'URL de l'image
+  // Cacher le header sur certaines routes
+  const hiddenRoutes = ["event", "settings","profile"];
+  const isHidden = hiddenRoutes.some((route) => segments.includes(route));
+
+  if (isHidden) {
+    return null; // Ne pas afficher le Header
+  }
 
   return (
     <View style={styles.headerContainer}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push("/settings")}>
           <Image
-            source={{ uri: profileImage }} // Utiliser l'image de profil ou l'image par défaut
+            source={{ uri: profileImage }}
             style={styles.profileImage}
           />
         </TouchableOpacity>
@@ -28,7 +35,7 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    backgroundColor: "pink",
+    backgroundColor: "grey",
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     overflow: "hidden",
@@ -36,7 +43,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    elevation: 5, // Ombre pour Android
+    elevation: 5,
   },
   header: {
     flexDirection: "row",

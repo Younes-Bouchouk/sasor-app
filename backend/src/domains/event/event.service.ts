@@ -137,7 +137,7 @@ export class EventService {
     async getEventParticipants(eventId: number) {
         return await this.prisma.eventParticipant.findMany({
             where: { eventId: Number(eventId) },
-            include: { participant: { select: { id: true, pseudo: true } } },
+            include: { participant: { select: { id: true, pseudo: true, image:true } } },
         });
     }
     /*

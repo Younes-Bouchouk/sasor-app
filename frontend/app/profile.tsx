@@ -19,7 +19,7 @@ import { useMutation } from "@tanstack/react-query";
 import { fetchAPI } from "@/services/api";
 import { useAuth } from "@/contexts/AuthProvider";
 import * as Haptics from "expo-haptics";
-import Svg, { Path } from "react-native-svg";
+import Svg, { Defs, LinearGradient, Path, Stop } from "react-native-svg";
 
 export default function ProfileScreen() {
   const { data: profile, isLoading, error, refetch } = useFetchQuery(
@@ -143,13 +143,19 @@ export default function ProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.headerBackground}>
-        <Svg height="160" width="100%" viewBox="0 0 1440 320">
+      <Svg height="120" width="300%" viewBox="30 -19 1550 310">
+                <Defs>
+    <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+      <Stop offset="0" stopColor="#18709E" stopOpacity="1" />
+      <Stop offset="1" stopColor="#ffffff" stopOpacity="1" />
+    </LinearGradient>
+  </Defs>
           <Path
             fill="url(#grad)"
-            d="M0,96L48,122.7C96,149,192,203,288,213.3C384,224,480,192,576,170.7C672,149,768,139,864,144C960,149,1056,171,1152,192C1248,213,1344,235,1392,245.3L1440,256V0H0Z"
-            fillOpacity="1"
+           d="M0,96L48,122.7C96,149,192,203,288,213.3C384,224,480,192,576,170.7C672,149,768,139,864,144C960,149,1056,171,1152,192C1248,213,1344,235,1392,245.3L1440,256V0H0Z"
+    fillOpacity="1"
           />
         </Svg>
         <View style={styles.profileSection}>
@@ -195,7 +201,7 @@ export default function ProfileScreen() {
           secure
         />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -227,7 +233,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#18709E",
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
-    paddingBottom: 40,
+    paddingBottom: 90,
     alignItems: "center",
   },
   profileSection: {
