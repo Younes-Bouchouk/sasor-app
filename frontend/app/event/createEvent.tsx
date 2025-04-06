@@ -50,8 +50,11 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
   const validateForm = () => {
     if (currentStep === 1 && !eventData.name) return "Le nom de l'événement est requis !";
     if (currentStep === 2 && !eventData.sport) return "Le sport est requis !";
-    if (currentStep === 3 && !eventData.location) return "Le lieu est requis !";
-    if (currentStep === 4 && !eventData.plannedAt) return "La date est requise !";
+    if (currentStep === 3) {
+      if (!eventData.location) return "Le lieu est requis !";
+      if (!cities.includes(eventData.location)) return "Veuillez sélectionner un lieu parmi les suggestions.";
+    }
+        if (currentStep === 4 && !eventData.plannedAt) return "La date est requise !";
     if (currentStep === 5 && !eventData.maxParticipants) return "Le nombre de participoant maximum est requis pour continuez !";
     if (currentStep === 6 && !eventData.visibility) return "La visibilmité de l'événement est requise !";
     if (currentStep === 7 && !eventData.description) return "La déscription de l'événement est requise !";
@@ -152,15 +155,23 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
         {/* Étape 3: Lieu */}
         {currentStep === 3 && (
           <>
-            <TextInput
-              placeholder="Lieu"
-              style={styles.input}
-              value={eventData.location}
-              onChangeText={(text) => {
-                setCityQuery(text);  
-                setEventData({ ...eventData, location: text });  
-              }}
-            />
+                    <TextInput
+            placeholder="Lieu"
+            style={styles.input}
+            value={eventData.location}
+            onChangeText={(text) => {
+              setCityQuery(text);
+              setEventData({ ...eventData, location: text });
+            }}
+            onBlur={() => {
+              // Si l'utilisateur tape quelque chose non reconnu, vide le champ
+              if (!cities.includes(eventData.location)) {
+                setEventData({ ...eventData, location: "" });
+              }
+            }}
+            
+          />
+
             {loadingCities && <ActivityIndicator size="small" color="#007AFF" />}
             <FlatList
               data={cities}
