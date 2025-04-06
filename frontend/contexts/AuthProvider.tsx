@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Récupérer les infos de l'utilisateur connecté
   const fetchUserData = async (authToken: any) => {
     try {
-      const userData = await fetchAPI("/users/me", "GET", null, authToken );
+      const userData = await fetchAPI("/users/me", "GET", token, authToken );
       setUserId(userData.id);
       setUser(userData);
     } catch (error) {

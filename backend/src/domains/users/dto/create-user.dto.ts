@@ -1,4 +1,4 @@
-import { IsDate, IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsDate, IsEmail, IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateUserDto {
@@ -20,4 +20,8 @@ export class CreateUserDto {
     @IsDate({ message: "La date de naissance doit être au format ISO-8601" })
     @IsNotEmpty({ message: "La date de naissance ne doit pas être vide" })
     birthday: Date
+
+    @IsString()
+    @IsOptional()
+    image?: string;
 }

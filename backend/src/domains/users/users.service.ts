@@ -24,20 +24,27 @@ export class UsersService {
 
     // Permet de mettre à jour les infos de l'utilisateur connecté
     async update(user: UserTokenData, updateUserDto: UpdateUserDto) {
-        if (updateUserDto.pseudo === user.pseudo)
-            throw new BadRequestException('Vous utilisé déjà ce pseudo')
-
-        const existingPseudo = await this.prisma.user.findUnique({
+        // Vérifiez si le champ `pseudo` est présent dans la requête
+        if (updateUserDto.pseudo) {
+          if (updateUserDto.pseudo === user.pseudo) {
+            throw new BadRequestException('Vous utilisez déjà ce pseudo');
+          }
+      
+          const existingPseudo = await this.prisma.user.findUnique({
             where: { pseudo: updateUserDto.pseudo },
-        });
-        if (existingPseudo)
+          });
+      
+          if (existingPseudo) {
             throw new BadRequestException('Le pseudo est déjà utilisé');
-
+          }
+        }
+      
+        // Effectuez la mise à jour
         return this.prisma.user.update({
-            where: { id: user.id },
-            data: updateUserDto,
+          where: { id: user.id },
+          data: updateUserDto,
         });
-    }
+      }
 
     async remove(user: UserTokenData) {
         //  Supprimer les participations aux événements organisés par l'utilisateur

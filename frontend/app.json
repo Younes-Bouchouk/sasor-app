@@ -43,6 +43,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "This app accesses your photos to let you share them with your friends."
+        }
       ]
     ],
     "experiments": {

@@ -26,4 +26,8 @@ export class CreateEventDto {
   @Type(() => Date)
   @IsDate({ message: "La date de l'event doit être au format ISO-8601" })
   plannedAt: Date;
+
+  @IsString()
+  @IsOptional()
+  image?: string; 
 }
