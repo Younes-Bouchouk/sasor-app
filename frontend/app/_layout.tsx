@@ -4,6 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { AuthProvider } from "../contexts/AuthProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import React from "react";
+import Header from "../components/ui/header"; // Import du Header
 
 const queryClient = new QueryClient();
 
@@ -12,18 +13,19 @@ export default function Layout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
+          {/* Ajout du Header */}
+          <Header />
           <Tabs
             screenOptions={({ route }) => ({
               headerShown: false,
               tabBarIcon: ({ color, size }) => {
                 let iconName: "calendar-outline" | "person-outline" | "person-add-outline" | undefined;
                 if (route.name === "index") iconName = "calendar-outline";
-                else if (route.name === "profile") iconName = "person-outline";
                 else if (route.name === "follow") iconName = "person-add-outline";
 
                 return iconName ? (
                   <Ionicons name={iconName} size={size} color={color} />
-                ) : null; // Ajout d'une condition de sécurité
+                ) : null;
               },
               tabBarActiveTintColor: "#18709E",
               tabBarInactiveTintColor: "gray",
@@ -44,12 +46,10 @@ export default function Layout() {
               },
             })}
           >
-            {/* Onglets visibles */}
             <Tabs.Screen name="index" options={{ title: "Événements" }} />
-            <Tabs.Screen name="profile" options={{ title: "profil" }} />
+            <Tabs.Screen name="profile" options={{ href:null }} />
             <Tabs.Screen name="follow" options={{ title: "abonnement" }} />
-
-            {/* Onglets cachés */}
+            <Tabs.Screen name="settings" options={{ href:null }} />
             <Tabs.Screen name="login" options={{ href: null }} />
             <Tabs.Screen name="register" options={{ href: null }} />
             <Tabs.Screen name="event/[id]" options={{ href: null }} />

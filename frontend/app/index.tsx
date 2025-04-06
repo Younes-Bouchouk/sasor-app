@@ -208,7 +208,7 @@ const ListItem = React.memo(
 
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F8F9FA", paddingTop: 10 },
+  container: { flex: 1, backgroundColor: "white", paddingTop: 10 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
   errorText: { color: "red", fontSize: 16, textAlign: "center" },
   cardContainer: { width: width - 40, alignSelf: "center", marginVertical: 10 },

@@ -29,4 +29,8 @@ export class UpdateEventDto {
   @IsOptional()
   @IsDate()
   plannedAt?: Date;
+  
+  @IsString()
+  @IsOptional()
+  image?: string;
 }

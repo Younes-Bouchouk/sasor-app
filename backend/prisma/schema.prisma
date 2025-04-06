@@ -11,10 +11,12 @@ model User {
   id                  Int                @id @default(autoincrement())
   email               String             @unique
   pseudo              String             @unique
+  sexe                String 
   password            String
   birthday            DateTime
   createdAt           DateTime           @default(now()) @map("created_at")
   updatedAt           DateTime           @updatedAt @map("updated_at")
+  image               String?    
   organizedEvents     Event[]
   invitationsReceived EventInvitation[]  @relation("InvitationReceiver")
   invitationsSent     EventInvitation[]  @relation("InvitationSender")
@@ -44,6 +46,7 @@ model Event {
   name            String
   description     String?
   sport           String
+  image           String?    
   maxParticipants Int                @map("max_participants")
   location        String
   visibility      EventVisibility    @default(PUBLIC)

@@ -42,6 +42,7 @@ export class AuthService {
                 email,
                 password: hashedPassword,
                 birthday: new Date(birthday),
+                sexe: registerDto.sexe
             }
         });
 

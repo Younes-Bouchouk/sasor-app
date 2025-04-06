@@ -43,6 +43,7 @@ export function useFetchCities(query: string) {
 
               return parts.join(", ");
             });
+           
 
           const unique = [...new Set(formatted)];
           setCities(unique);
