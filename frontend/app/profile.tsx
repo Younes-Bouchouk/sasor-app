@@ -9,12 +9,17 @@ import {
   Image,
   ActivityIndicator,
   Alert,
+  ScrollView,
+  Platform,
+  Animated,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useFetchQuery } from "@/hooks/useFetchQuery";
 import { useMutation } from "@tanstack/react-query";
 import { fetchAPI } from "@/services/api";
 import { useAuth } from "@/contexts/AuthProvider";
+import * as Haptics from "expo-haptics";
+import Svg, { Path } from "react-native-svg";
 
 export default function ProfileScreen() {
   const { data: profile, isLoading, error, refetch } = useFetchQuery(
@@ -30,7 +35,6 @@ export default function ProfileScreen() {
   const [isUploading, setIsUploading] = useState(false);
   const { token } = useAuth();
 
-  // Mettre à jour les champs avec les données récupérées
   useEffect(() => {
     if (profile) {
       setEmail(profile.email || "");
@@ -41,12 +45,12 @@ export default function ProfileScreen() {
   }, [profile]);
 
   const updateField = useMutation({
-    mutationFn: async (formData: any) => {
+    mutationFn: async (formData) => {
       return fetchAPI("/users/me", "PATCH", token, formData);
     },
     onSuccess: () => {
       Alert.alert("Succès", "Votre profil a été mis à jour !");
-      refetch(); // Recharger les données utilisateur
+      refetch();
     },
     onError: (error) => {
       console.error("Erreur lors de la mise à jour :", error);
@@ -54,9 +58,8 @@ export default function ProfileScreen() {
     },
   });
 
-  const handleUpdateField = (field: string, value: string) => {
-    const formData: any = { [field]: value };
-    console.log(`Mise à jour du champ ${field} avec la valeur :`, value);
+  const handleUpdateField = (field, value) => {
+    const formData = { [field]: value };
     updateField.mutate(formData);
   };
 
@@ -89,7 +92,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const uploadImageToImgBB = async (imageUri: string) => {
+  const uploadImageToImgBB = async (imageUri) => {
     setIsUploading(true);
     try {
       const formData = new FormData();
@@ -109,11 +112,8 @@ export default function ProfileScreen() {
 
       const data = await response.json();
       if (data.success) {
-        const imageUrl = data.data.url; // URL de l'image récupérée
-        setProfileImage(imageUrl); // Mettre à jour l'état local
-        console.log("Image téléchargée avec succès :", imageUrl);
-
-        // Envoyer l'URL de l'image au backend immédiatement
+        const imageUrl = data.data.url;
+        setProfileImage(imageUrl);
         updateField.mutate({ image: imageUrl });
       } else {
         Alert.alert("Erreur", "Impossible de télécharger l'image.");
@@ -144,114 +144,114 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Mon Profil</Text>
+      <View style={styles.headerBackground}>
+        <Svg height="160" width="100%" viewBox="0 0 1440 320">
+          <Path
+            fill="url(#grad)"
+            d="M0,96L48,122.7C96,149,192,203,288,213.3C384,224,480,192,576,170.7C672,149,768,139,864,144C960,149,1056,171,1152,192C1248,213,1344,235,1392,245.3L1440,256V0H0Z"
+            fillOpacity="1"
+          />
+        </Svg>
+        <View style={styles.profileSection}>
+          <TouchableOpacity onPress={handlePickImage}>
+            <Image
+              source={{
+                uri: profileImage || "https://i.ibb.co/SwQk3MHz/logo-white-mini.png",
+              }}
+              style={styles.profileImage}
+            />
+            <Text style={styles.changePhotoText}>Changer la photo</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
-      <View style={styles.profileSection}>
-        <TouchableOpacity onPress={handlePickImage}>
-          <Image
-            source={{
-              uri: profileImage || "https://i.ibb.co/SwQk3MHz/logo-white-mini.png",
-            }}
-            style={styles.profileImage}
-          />
-          <Text style={styles.changePhotoText}>Changer la photo</Text>
+      <ScrollView contentContainerStyle={styles.form}>
+        <InputField
+          label="Pseudo"
+          value={pseudo}
+          onChangeText={(text) => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setPseudo(text);
+          }}
+          onSave={() => handleUpdateField("pseudo", pseudo)}
+        />
+        <InputField
+          label="Email"
+          value={email}
+          onChangeText={(text) => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setEmail(text);
+          }}
+          onSave={() => handleUpdateField("email", email)}
+        />
+        <InputField
+          label="Mot de passe"
+          value={password}
+          onChangeText={(text) => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setPassword(text);
+          }}
+          onSave={() => handleUpdateField("password", password)}
+          secure
+        />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+function InputField({ label, value, onChangeText, onSave, secure }) {
+  return (
+    <View style={{ marginBottom: 20 }}>
+      <Text style={styles.label}>{label}</Text>
+      <View style={styles.inputRow}>
+        <TextInput
+          style={styles.input}
+          value={value}
+          onChangeText={onChangeText}
+          secureTextEntry={secure}
+        />
+        <TouchableOpacity style={styles.saveButton} onPress={onSave}>
+          <Text style={styles.saveButtonText}>✔</Text>
         </TouchableOpacity>
       </View>
-
-      <View style={styles.form}>
-        <Text style={styles.label}>Pseudo</Text>
-        <View style={styles.inputRow}>
-          <TextInput
-            style={styles.input}
-            value={pseudo}
-            onChangeText={setPseudo}
-          />
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={() => handleUpdateField("pseudo", pseudo)}
-          >
-            <Text style={styles.saveButtonText}>Enregistrer</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.label}>Email</Text>
-        <View style={styles.inputRow}>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-          />
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={() => handleUpdateField("email", email)}
-          >
-            <Text style={styles.saveButtonText}>Enregistrer</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.label}>Mot de passe</Text>
-        <View style={styles.inputRow}>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            placeholder="Laissez vide pour ne pas changer"
-          />
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={() => handleUpdateField("password", password)}
-          >
-            <Text style={styles.saveButtonText}>Enregistrer</Text>
-          </TouchableOpacity>
-        </View>
-
-       
-      </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f9f9f9",
-    padding: 20,
+    backgroundColor: "#fff",
   },
-  header: {
+  headerBackground: {
+    backgroundColor: "#18709E",
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    paddingBottom: 40,
     alignItems: "center",
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#18709E",
   },
   profileSection: {
+    marginTop: -50,
     alignItems: "center",
-    marginBottom: 30,
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: "#18709E",
+    width: 150,
+    height: 150,
+    borderRadius: 90,
+    borderWidth: 4,
+    borderColor: "#fff",
   },
   changePhotoText: {
-    marginTop: 10,
-    color: "#18709E",
-    fontSize: 14,
+    marginTop: 8,
+    color: "#fff",
+    fontWeight: "500",
   },
   form: {
-    marginBottom: 30,
+    padding: 20,
   },
   label: {
     fontSize: 16,
-    color: "#555",
+    color: "#333",
     marginBottom: 5,
   },
   inputRow: {
@@ -264,8 +264,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 8,
     padding: 10,
-    marginBottom: 15,
-    backgroundColor: "#fff",
+    backgroundColor: "#f0f0f0",
   },
   saveButton: {
     backgroundColor: "#18709E",

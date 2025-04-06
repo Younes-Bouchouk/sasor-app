@@ -220,7 +220,7 @@ export default function RegisterScreen() {
         </TouchableOpacity>
 
         {/* Lien vers la connexion */}
-        <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+        <TouchableOpacity onPress={() => navigation.navigate("login")}>
           <Text style={styles.link}>
             Vous avez déjà un compte ? Connectez-vous
           </Text>
