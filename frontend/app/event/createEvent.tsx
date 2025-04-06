@@ -6,6 +6,7 @@ import { useFetchSports } from "@/hooks/useFetchSport";
 import { RefetchOptions } from "@tanstack/react-query";
 import React from "react";
 import { DatePicker } from "@/components/ui/DatePicker";
+import Icon, { Ionicons } from '@expo/vector-icons';
 
 // Définir un type pour les données de l'événement
 interface EventData {
@@ -13,7 +14,7 @@ interface EventData {
   sport: string;
   location: string;
   plannedAt: string;
-  maxParticipants: number;
+  maxParticipants: number | string;
   visibility: string;
   description: string;
 }
@@ -51,8 +52,10 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
     if (currentStep === 2 && !eventData.sport) return "Le sport est requis !";
     if (currentStep === 3 && !eventData.location) return "Le lieu est requis !";
     if (currentStep === 4 && !eventData.plannedAt) return "La date est requise !";
-    if (currentStep === 5 && !eventData.visibility) return "Le statut de votre événement est requis !";
-    if (currentStep === 6 && !eventData.description) return "La description est requise !";
+    if (currentStep === 5 && !eventData.maxParticipants) return "Le nombre de participoant maximum est requis pour continuez !";
+    if (currentStep === 6 && !eventData.visibility) return "La visibilmité de l'événement est requise !";
+    if (currentStep === 7 && !eventData.description) return "La déscription de l'événement est requise !";
+
     return "";
   };
 
@@ -116,13 +119,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               value={eventData.name}
               onChangeText={(text) => setEventData({ ...eventData, name: text })}
             />
-            <TouchableOpacity 
-              style={styles.button} 
-              onPress={transitionToNextStep}
-              disabled={isPending} // Désactive le bouton si une requête est en cours
-            >
-              <Text style={styles.buttonText}>Suivant</Text>
-            </TouchableOpacity>
+           
           </>
         )}
 
@@ -148,13 +145,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
                 </TouchableOpacity>
               )}
             />
-            <TouchableOpacity 
-              style={styles.button} 
-              onPress={transitionToNextStep}
-              disabled={isPending}
-            >
-              <Text style={styles.buttonText}>Suivant</Text>
-            </TouchableOpacity>
+           
           </>
         )}
 
@@ -185,13 +176,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
                 </TouchableOpacity>
               )}
             />
-            <TouchableOpacity 
-              style={styles.button} 
-              onPress={transitionToNextStep}
-              disabled={isPending}
-            >
-              <Text style={styles.buttonText}>Suivant</Text>
-            </TouchableOpacity>
+            
           </>
         )}
 
@@ -208,18 +193,24 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
                 value={eventData.plannedAt}
                 onChange={(text) => setEventData({...eventData, plannedAt: text})}
             />
-            <TouchableOpacity 
-              style={styles.button} 
-              onPress={transitionToNextStep}
-              disabled={isPending}
-            >
-              <Text style={styles.buttonText}>Suivant</Text>
-            </TouchableOpacity>
+            
           </>
         )}
 
-        {/* Étape 5: Visibilité */}
+        {/* Étape 5: max participant */}
         {currentStep === 5 && (
+          <>
+            <TextInput
+              placeholder="nomvre maximum de participant"
+              style={styles.input}
+              value={eventData.maxParticipants}
+              onChangeText={(text) => setEventData({ ...eventData, maxParticipants: text })}
+            />
+           
+          </>
+        )}
+         {/* Étape 6: Visibilité */}
+         {currentStep === 6 && (
           <>
             <Text style={styles.modalTitle}>Choisissez la visibilité</Text>
             <View style={styles.visibilityOptions}>
@@ -233,18 +224,12 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
                 </TouchableOpacity>
               ))}
             </View>
-            <TouchableOpacity 
-              style={styles.button} 
-              onPress={transitionToNextStep}
-              disabled={isPending}
-            >
-              <Text style={styles.buttonText}>Suivant</Text>
-            </TouchableOpacity>
+        
           </>
         )}
 
-        {/* Étape 6: Description */}
-        {currentStep === 6 && (
+        {/* Étape 7: Description */}
+        {currentStep === 7 && (
           <>
             <TextInput
               placeholder="Description de l'événement"
@@ -252,47 +237,207 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
               value={eventData.description}
               onChangeText={(text) => setEventData({ ...eventData, description: text })}
             />
-            <TouchableOpacity 
-              style={styles.button} 
-              onPress={submit}
-              disabled={isPending} // Désactive le bouton de soumission si une requête est en cours
-            >
-              <Text style={styles.buttonText}>Créer l'événement</Text>
-            </TouchableOpacity>
+           
           </>
         )}
 
-        {/* Affichage des messages */}
-        {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
-        {isError ? <Text style={styles.errorText}>{error?.message}</Text> : null}
-        {isPending && <ActivityIndicator size="small" color="#007AFF" />}
-        <TouchableOpacity onPress={onClose}>
-          <Text style={styles.cancelText}>Annuler</Text>
-        </TouchableOpacity>
-      </Animated.View>
+       {/* Bouton précédent + suivant ou soumettre */}
+    <View style={styles.navigationButtons}>
+      {currentStep > 1 && (
+       <TouchableOpacity
+       style={[styles.button, styles.backButton]}
+       onPress={() => setCurrentStep((prev) => prev - 1)}
+     >
+       <Text style={styles.buttonText}> Précédent</Text>
+       <Ionicons name="arrow-back" size={18} color="#fff" />
+     </TouchableOpacity>
+     
+      )}
+
+      {currentStep < 7 ? (
+        <TouchableOpacity
+        style={styles.button}
+        onPress={transitionToNextStep}
+        disabled={isPending}
+      >
+        <Text style={styles.buttonText}>Suivant </Text>
+        <Ionicons name="arrow-forward" size={18} color="#fff" />
+      </TouchableOpacity>
+      
+      ) : (
+        <TouchableOpacity
+        style={styles.button}
+        onPress={submit}
+        disabled={isPending}
+      >
+        <Text style={styles.buttonText}> Créer l'événement</Text>
+        <Ionicons name="checkmark-circle" size={18} color="#fff" />
+
+      </TouchableOpacity>
+
+      )}
     </View>
+
+   
+      <View style={styles.progressBarContainer}>
+    <View style={[styles.progressBar, { width: `${(currentStep / 7) * 100}%` }]} />
+  </View>
+
+    {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+    {isError ? <Text style={styles.errorText}>{error?.message}</Text> : null}
+    {isPending && <ActivityIndicator size="small" color="#007AFF" />}
+    <TouchableOpacity onPress={onClose}>
+      <Text style={styles.cancelText}>Annuler</Text>
+    </TouchableOpacity>
+  </Animated.View>
+</View>
   );
 }
 
 
 const styles = StyleSheet.create({
-  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
-  modalContent: { backgroundColor: "#fff", padding: 20, borderRadius: 15, width: "85%", shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 5 },
-  modalTitle: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 15 },
-  input: { borderBottomWidth: 1, marginBottom: 10, padding: 8, fontSize: 16 },
-  suggestion: { padding: 10, borderBottomWidth: 1, borderBottomColor: "#ddd" },
-  button: { backgroundColor: "#007AFF", padding: 12, borderRadius: 10, alignItems: "center", marginTop: 10 },
-  buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-  cancelText: { marginTop: 10, textAlign: "center", color: "red", fontSize: 16 },
-  errorText: { color: "red", fontSize: 14, textAlign: "center", marginTop: 10 },
-  visibilityOptions: { marginVertical: 10 },
-  visibilityButton: {
-    padding: 10,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 5,
-    marginVertical: 5,
-    alignItems: "center",
+  progressBarContainer: {
+    height: 10,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginVertical: 20,
   },
-  selectedButton: { backgroundColor: "#007AFF" },
+  progressBar: {
+    height: '100%',
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+  },
+  
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
+  modalContent: {
+    backgroundColor: "#ffffff",
+    padding: 24,
+    borderRadius: 20,
+    width: "90%",
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  modalTitle: {
+    fontSize: 26,
+    fontWeight: "700",
+    textAlign: "center",
+    color: "#1c1c1e",
+    marginBottom: 20,
+  },
+  input: {
+    backgroundColor: "#f5f5f7",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#d1d1d6",
+  },
+  suggestion: {
+    padding: 12,
+    fontSize: 16,
+    color: "#333",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  button: {
+    flex: 1,
+    backgroundColor: "#007AFF",
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: "center",
+    marginTop: 10,
+    shadowColor: "#007AFF",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  backButton: {
+    backgroundColor: "#d1d1d6",
+    marginRight: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+    flexDirection: "row"
+  },
+  cancelText: {
+    marginTop: 15,
+    textAlign: "center",
+    color: "#ff3b30",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  errorText: {
+    color: "#ff3b30",
+    fontSize: 15,
+    textAlign: "center",
+    marginTop: 10,
+    fontWeight: "500",
+  },
+  visibilityOptions: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginVertical: 15,
+  },
+  visibilityButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    backgroundColor: "#e5e5ea",
+  },
+  selectedButton: {
+    backgroundColor: "#007AFF",
+  },
+  navigationButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+  },
+  stepper: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 25,
+    marginBottom: 10,
+  },
+  stepCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: "#ccc",
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: 5,
+    backgroundColor: "#f5f5f5",
+  },
+  activeStep: {
+    borderColor: "#007AFF",
+    backgroundColor: "#007AFF",
+  },
+  completedStep: {
+    borderColor: "#4cd964",
+    backgroundColor: "#4cd964",
+  },
+  stepText: {
+    fontSize: 14,
+    color: "#888",
+    fontWeight: "bold",
+  },
+  activeStepText: {
+    color: "#fff",
+  },
 });
+
 
