@@ -10,9 +10,19 @@ interface AuthContextType {
   token: string | null;
   login: (token: string) => Promise<void>;
   logout: () => Promise<void>;
+  refetchUser: () => Promise<void>;
+  updateUserImage: (imageUrl: string) => void;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext({
+  user: null,
+  token: null,
+  login: async (token: string) => {},
+  logout: async () => {},
+  refetchUser: async () => {},
+  updateUserImage: (imageUrl: string) => {}, // Ajout de cette méthode
+});
+
 const queryClient = new QueryClient();
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userId, setUserId] = useState<number | null>(null);
@@ -26,20 +36,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (storedToken) {
         setToken(storedToken);
         await fetchUserData(storedToken);
+      } else {
+        console.log("Aucun token trouvé dans AsyncStorage");
       }
     };
     loadAuthData();
   }, []);
 
+  // Restaurer l'image depuis AsyncStorage au démarrage
+  useEffect(() => {
+    const loadUserImage = async () => {
+      const storedImage = await AsyncStorage.getItem("userImage");
+      if (storedImage) {
+        setUser((prevUser: any) => ({
+          ...prevUser,
+          image: storedImage,
+        }));
+      }
+    };
+    loadUserImage();
+  }, []);
+
   // Récupérer les infos de l'utilisateur connecté
-  const fetchUserData = async (authToken: any) => {
+  const fetchUserData = async (authToken: string) => {
     try {
-      const userData = await fetchAPI("/users/me", "GET", token, authToken );
+      const userData = await fetchAPI("/users/me", "GET", authToken);
+      console.log("Données utilisateur restaurées :", userData); // Vérifiez que `image` est présent
       setUserId(userData.id);
       setUser(userData);
     } catch (error) {
-      console.error("Erreur lors de la récupération des données utilisateur", error);
+      console.error("Erreur lors de la récupération des données utilisateur :", error);
     }
+  };
+
+  const updateUserImage = async (imageUrl: string) => {
+    setUser((prevUser: any) => ({
+      ...prevUser,
+      image: imageUrl,
+    }));
+    await AsyncStorage.setItem("userImage", imageUrl); // Sauvegarder l'image localement
   };
 
   // Sauvegarder le token et récupérer l'utilisateur
@@ -59,8 +94,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     router.replace("/login");
   };
 
+  const refetchUser = async () => {
+    if (token) {
+      await fetchUserData(token);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ userId, user, token, login, logout }}>
+    <AuthContext.Provider value={{ userId, user, token, login, logout, refetchUser, updateUserImage }}>
       {children}
     </AuthContext.Provider>
   );

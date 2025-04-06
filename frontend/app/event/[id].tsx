@@ -97,20 +97,32 @@ export default function EventDetailsScreen() {
                 <ActivityIndicator size="small" color="#0ABDE3" />
               ) : (
                 <FlatList
-                  data={participants}
-                  keyExtractor={(item) => item.id.toString()}
-                  renderItem={({ item }) => (
-                    <View style={styles.participantItem}>
-                      <Text style={styles.participantName}>{item.participant.pseudo}</Text>
+                data={participants}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <View style={styles.participantItem}>
+                    {/* Image du participant */}
+                    <Image
+                      source={{
+                        uri: item.participant?.image || "https://via.placeholder.com/150", // Image par défaut
+                      }}
+                      style={styles.participantImage}
+                      onError={(error) =>
+                        console.error("Erreur de chargement de l'image :", error.nativeEvent)
+                      }
+                    />
+                    {/* Informations du participant */}
+                    <View style={styles.participantInfo}>
+                      <Text style={styles.participantName}>{item.participant?.pseudo || "Inconnu"}</Text>
                       <Text style={styles.joinedAt}>
-                      {isValidDate(new Date(event.plannedAt))
-                        ? format(new Date(event.plannedAt), "dd MMMM yyyy", { locale: fr })
-                        : "Date inconnue"}
-                    </Text>
-
+                        {isValidDate(new Date(event.plannedAt))
+                          ? format(new Date(event.plannedAt), "dd MMMM yyyy", { locale: fr })
+                          : "Date inconnue"}
+                      </Text>
                     </View>
-                  )}
-                />
+                  </View>
+                )}
+              />
               )}
               <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
                 <Text style={styles.buttonText}>Fermer</Text>
@@ -143,9 +155,37 @@ const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center" },
   modalContainer: { backgroundColor: "#1E1E1E", padding: 20, borderRadius: 10, width: "80%" },
   modalTitle: { fontSize: 22, fontWeight: "bold", color: "#FFF", marginBottom: 10 },
-  participantItem: { backgroundColor: "#2A2A2A", padding: 10, marginVertical: 5, borderRadius: 8 },
-  participantName: { fontSize: 16, fontWeight: "bold", color: "#FFF" },
-  joinedAt: { fontSize: 14, color: "#BBBBBB" },
+  participantItem: {
+    flexDirection: "row", // Organise les éléments horizontalement
+    alignItems: "center", // Aligne verticalement au centre
+    backgroundColor: "#2A2A2A",
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 8,
+  },
+  participantImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10, // Espace entre l'image et les informations
+    backgroundColor: "#ccc", // Couleur de fond pour vérifier si l'image est chargée
+  },
+  participantInfo: {
+    flex: 1, // Prend tout l'espace restant
+    justifyContent: "center", // Centre verticalement les textes
+  },
+  participantName: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#FFF",
+  },
+  joinedAt: {
+    fontSize: 14,
+    color: "#BBBBBB",
+    marginTop: 4, // Espace entre le pseudo et la date
+  },
+
+
   closeButton: { backgroundColor: "#FF5252", padding: 12, borderRadius: 8, marginTop: 10, alignItems: "center" },
   errorText: { color: "#E74C3C", fontSize: 16, marginTop: 10, textAlign: "center" },
 });
