@@ -34,30 +34,27 @@ export default function Header() {
 }
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    backgroundColor: "#1E1E2C",
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
-  },
+  // headerContainer: {
+  //   overflow: "hidden",
+  //   shadowColor: "#000",
+  //   shadowOffset: { width: 0, height: 4 },
+  //   shadowOpacity: 0.1,
+  //   shadowRadius: 10,
+        
+  // },
   header: {
     flexDirection: "row",
     justifyContent: "flex-end",
     alignItems: "center",
-    paddingHorizontal: 15,
     paddingTop: Platform.OS === "android" || Platform.OS === "ios" ? StatusBar.currentHeight || 38 : 38,
-    paddingBottom: 20,
+    position: "fixed",
   },
   profileImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 30,
     borderWidth: 2,
     borderColor: "white",
+    position: "fixed",
   },
 });

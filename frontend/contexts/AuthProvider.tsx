@@ -87,6 +87,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Déconnexion
   const logout = async () => {
     await AsyncStorage.removeItem("authToken");
+    await AsyncStorage.removeItem("userImage"); 
+    await AsyncStorage.removeItem("authToken");
     setToken(null);
     setUserId(null);
     setUser(null);
