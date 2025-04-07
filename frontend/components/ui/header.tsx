@@ -35,7 +35,7 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    backgroundColor: "grey",
+    backgroundColor: "#1E1E2C",
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     overflow: "hidden",
