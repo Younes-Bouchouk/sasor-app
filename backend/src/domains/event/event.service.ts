@@ -61,7 +61,6 @@ export class EventService {
                     });
                     if (!isFollowing) return null;
                 }
-
                 return event;
             }),
         );
@@ -69,15 +68,45 @@ export class EventService {
         return eventsFiltered.filter((event) => event !== null);
     }
     /*
-                        !  Récupérer les événements créés par un utilisateur spécifique. */
+    !  Récupérer les événements créés par un utilisateur spécifique. */
     async getUserEvents(userId: number) {
         // fitre les événements où organizerId correspond à l'userId donné.
         return await this.prisma.event.findMany({
             where: { organizerId: userId },
         });
     }
+
+        /*
+    !  Récupérer les événements créés par un utilisateur spécifique. */
+    async getJoinedEvents(userId: number) {
+        const participations = await this.prisma.eventParticipant.findMany({
+            where: { participantId: userId},
+            include: {
+                event: true
+            }
+        })
+
+        const events = await Promise.all(
+            participations.map(async (p)=>{
+                return {
+                
+                    ...p.event,
+                    isOrganizer: p.participantId == p.event.organizerId
+                }
+            })
+        )
+
+        console.log(events)
+        console.log('_________________________________________')
+        return events
+        // fitre les événements où organizerId correspond à l'userId donné.
+        return await this.prisma.event.findMany({
+            where: { organizerId: userId },
+        });
+    }
+
     /*
-                        ! Récupérer les événements créés par mes follower  */
+    ! Récupérer les événements créés par mes follower  */
     async getFollowersEvents(userId: number) {
         // Récupérer les IDs des utilisateurs suivis
         const following = await this.prisma.follow.findMany({
@@ -137,7 +166,11 @@ export class EventService {
     async getEventParticipants(eventId: number) {
         return await this.prisma.eventParticipant.findMany({
             where: { eventId: Number(eventId) },
-            include: { participant: { select: { id: true, pseudo: true, image:true } } },
+            include: {
+                participant: {
+                    select: { id: true, pseudo: true, image: true },
+                },
+            },
         });
     }
     /*
