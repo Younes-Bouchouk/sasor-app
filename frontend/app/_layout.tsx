@@ -5,6 +5,7 @@ import { AuthProvider } from "../contexts/AuthProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import React from "react";
 import Header from "../components/ui/header"; // Import du Header
+import UserProfile from "./profile/[id]";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ export default function Layout() {
             <Tabs.Screen name="register" options={{ href: null }} />
             <Tabs.Screen name="event/[id]" options={{ href: null }} />
             <Tabs.Screen name="event/createEvent" options={{ href: null }} />
+            <Tabs.Screen name="profile/[id]" options={{title: 'userprofile'  }} />
           </Tabs>
         </QueryClientProvider>
       </AuthProvider>
