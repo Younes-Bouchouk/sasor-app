@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 
 export default function FollowPage() {
-  const { data: followers, isLoading: loadingFollowers, error: errorFollowers,refetch } = useFetchQuery(
+  const { data: followers, isLoading: loadingFollowers, error: errorFollowers, refetch } = useFetchQuery(
     "follows",
     "/follows/me/following"
   );

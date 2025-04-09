@@ -62,6 +62,7 @@ export class FollowsController {
         @Body() deleteFollowDto: DeleteFollowDto,
         @Req() req: AuthenticatedRequest,
     ) {
+        console.log("Ne plus follow")
         return this.followsService.remove(deleteFollowDto, req.user);
     }
 }
