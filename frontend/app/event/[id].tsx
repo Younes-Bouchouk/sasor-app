@@ -1,12 +1,6 @@
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  ActivityIndicator,
-  Modal,
+
+import { 
+  View, Text, Image, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Modal, Alert 
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useFetchQuery } from "../../hooks/useFetchQuery";
@@ -20,16 +14,32 @@ import { useState } from "react";
 import { getSportImage } from "@/utils/imageMapper";
 import { ScrollView } from "react-native-gesture-handler";
 import React from "react";
+import * as ImagePicker from "expo-image-picker";
+import { fetchAPI } from "@/services/api";
+import { useImageUploader } from "@/hooks/useImageUploader";
 
 export default function EventDetailsScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const queryClient = useQueryClient();
   const [modalVisible, setModalVisible] = useState(false);
   const isValidDate = (d: any) => {
     return d instanceof Date && !isNaN(d.getTime());
   };
+
+  
+  const { uploadImageToImgBB, updateImage } = useImageUploader();
+
+  const updateEventImage = async (eventId: number) => {
+    const imageUrl = await uploadImageToImgBB();
+    if (imageUrl) {
+      await updateImage(imageUrl, `/events/${eventId}`, token);
+      queryClient.invalidateQueries({ queryKey: [`event-${eventId}`] }); // Rafraîchir les données
+    }
+  };
+  
+  if (!id) return <Text style={styles.errorText}>Erreur : ID d'événement invalide</Text>;
 
   if (!id)
     return (
@@ -72,29 +82,28 @@ export default function EventDetailsScreen() {
   if (!event)
     return <Text style={styles.errorText}>Aucun événement trouvé</Text>;
 
+  console.log("Token :", user.token);
+  console.log("Event ID :", event.id);
+
   return (
     <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
-        {/* Image de l'événement */}
-        <Image
-          source={{ uri: event.image || getSportImage(event.sport) }}
-          style={styles.image}
-        />
 
-        {/* Contenu de l'événement */}
-        <ScrollView style={styles.detailsContainer}>
-          <Text style={styles.title}>{event.name}</Text>
-          <Text style={styles.sportType}>Sport : {event.sport}</Text>
-          <Text style={styles.date}>
-            {isValidDate(new Date(event.plannedAt))
-              ? format(new Date(event.plannedAt), "dd MMMM yyyy", {
-                  locale: fr,
-                })
-              : "Date inconnue"}
-          </Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
+    <TouchableOpacity onPress={() => updateEventImage(event.id)}>
+  <Image
+    source={{ uri: event.image || getSportImage(event.sport) }}
+    style={styles.image}
+  />
+</TouchableOpacity>
+      {/* Contenu de l'événement */}
+      <ScrollView style={styles.detailsContainer}>
+        <Text style={styles.title}>{event.name}</Text>
+        <Text style={styles.sportType}>Sport : {event.sport}</Text>
+        <Text style={styles.date}>
+        {isValidDate(new Date(event.plannedAt))
+          ? format(new Date(event.plannedAt), "dd MMMM yyyy", { locale: fr })
+          : "Date inconnue"}
+      </Text>
 
           <Text style={styles.location}>Lieu : {event.location}</Text>
           <Text style={styles.participants}>
@@ -194,6 +203,7 @@ export default function EventDetailsScreen() {
                   <Text style={styles.buttonText}>Fermer</Text>
                 </TouchableOpacity>
               </View>
+
             </View>
           </Modal>
         </ScrollView>

@@ -20,7 +20,7 @@ export default function Header() {
   }
 
   return (
-    <View style={styles.headerContainer}>
+    <View>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.push("/settings")}>
           <Image

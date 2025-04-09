@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-import { AuthProvider } from "../contexts/AuthProvider";
+import { AuthProvider } from "@/contexts/AuthProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import React from "react";
 import Header from "../components/ui/header"; // Import du Header
@@ -20,10 +20,10 @@ export default function Layout() {
             screenOptions={({ route }) => ({
               headerShown: false,
               tabBarIcon: ({ color, size }) => {
-                let iconName: "calendar-outline" | "person-outline" | "person-add-outline" | undefined;
+                let iconName: "calendar-outline" | "person-outline" | "person-add-outline" | "search-outline" | undefined;
                 if (route.name === "index") iconName = "calendar-outline";
                 else if (route.name === "follow") iconName = "person-add-outline";
-
+                else if (route.name === "search") iconName = "search-outline";
                 return iconName ? (
                   <Ionicons name={iconName} size={size} color={color} />
                 ) : null;
@@ -48,6 +48,7 @@ export default function Layout() {
             })}
           >
             <Tabs.Screen name="index" options={{ title: "Événements" }} />
+            <Tabs.Screen name="search" options={{ title: "Recherche" }} />
             <Tabs.Screen name="profile" options={{ href:null }} />
             <Tabs.Screen name="follow" options={{ title: "abonnement" }} />
             <Tabs.Screen name="settings" options={{ href:null }} />
