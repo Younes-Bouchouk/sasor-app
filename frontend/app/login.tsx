@@ -48,7 +48,7 @@ export default function LoginScreen() {
       }
 
       await login(result.access_token);
-      navigation.navigate("index"); // Redirige vers la page d'accueil
+      navigation.navigate("index"); 
     } catch (error) {
       console.error("Erreur de connexion :", error);
       setLoginError("Une erreur est survenue. Veuillez réessayer.");

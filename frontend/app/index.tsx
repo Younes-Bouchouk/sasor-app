@@ -174,7 +174,7 @@ const ListItem = React.memo(
         <Animated.View style={[styles.cardContainer, rStyle]}>
           <TouchableOpacity
             style={styles.card}
-            onLongPress={isOwner ? handleDelete : null}
+            onLongPress={isOwner ? handleDelete : undefined}
             onPress={() =>
               router.push({
                 pathname: "/event/[id]",
