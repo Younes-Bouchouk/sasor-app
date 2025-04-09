@@ -1,4 +1,4 @@
-export const API_BASE_URL = "http://10.57.32.65:4000";
+export const API_BASE_URL = "http://192.168.1.216:4000";
 
 export const fetchAPI = async (path: string, method: string = "GET", token?: string | null, body?: object | void) => {
   try {
@@ -10,7 +10,6 @@ export const fetchAPI = async (path: string, method: string = "GET", token?: str
       headers["Authorization"] = `Bearer ${token}`; // Ajout du token dans les headers
     }
 
-    // Si la méthode est GET ou HEAD, on ne met pas de body
     const options: RequestInit = {
       method,
       headers,
@@ -22,10 +21,25 @@ export const fetchAPI = async (path: string, method: string = "GET", token?: str
 
     const response = await fetch(`${API_BASE_URL}${path}`, options);
 
-    const text = await response.text();
-    const data = text ? JSON.parse(text) : {};
+    // Vérifiez si le statut HTTP indique une erreur
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Une erreur est survenue.");
+    }
 
-    return data;
+    // Si la réponse est vide (204 No Content), retournez un objet vide
+    if (response.status === 204 || response.headers.get("content-length") === "0") {
+      return {}; // Retourne un objet vide pour les réponses sans contenu
+    }
+
+    // Vérifiez si la réponse est JSON
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json(); // Parse la réponse en JSON
+    }
+
+    // Si la réponse n'est pas JSON, retournez-la sous forme de texte brut
+    return await response.text();
   } catch (error) {
     console.error("❌ Erreur API:", error);
     throw error;
