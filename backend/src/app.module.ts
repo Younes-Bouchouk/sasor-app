@@ -7,6 +7,7 @@ import {EventModule} from './domains/event/event.module'
 import { FollowsModule } from './domains/follows/follows.module';
 import { EventsMessagesModule } from './domains/events-messages/events-messages.module';
 import { EventsInvitationsModule } from './domains/events-invitations/events-invitations.module';
+import { SearchModule } from './search/search.module';
 @Module({
     imports: [
        ConfigModule.forRoot({
@@ -17,7 +18,8 @@ import { EventsInvitationsModule } from './domains/events-invitations/events-inv
         AuthModule,
         EventModule,
         EventsMessagesModule,
-        EventsInvitationsModule
+        EventsInvitationsModule,
+        SearchModule
     ],
     controllers: [AppController],
 })

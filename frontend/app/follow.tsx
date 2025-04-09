@@ -20,6 +20,7 @@ export default function FollowPage() {
     error: errorFollowers,
     refetch,
   } = useFetchQuery("follows", "/follows/me/following");
+
   // Réexécuter la requête quand l'utilisateur change (utile après connexion/déconnexion)
   const { token, logout } = useAuth();
   useEffect(() => {

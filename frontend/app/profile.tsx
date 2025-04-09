@@ -174,6 +174,7 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={styles.form}>
         <InputField
           label="Pseudo"
+          
           value={pseudo}
           onChangeText={(text) => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
