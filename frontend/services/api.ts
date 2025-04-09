@@ -1,4 +1,5 @@
-export const API_BASE_URL = "http://192.168.1.86:4000"; // Ip école
+export const API_BASE_URL = "http://192.168.1.23:4000";
+
 
 export const fetchAPI = async (path: string, method: string = "GET", token?: string | null, body?: object | void) => {
   try {
