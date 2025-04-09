@@ -20,6 +20,7 @@ import { fetchAPI } from "@/services/api";
 import { useAuth } from "@/contexts/AuthProvider";
 import * as Haptics from "expo-haptics";
 import Svg, { Defs, LinearGradient, Path, Stop } from "react-native-svg";
+import { useImageUploader } from "@/hooks/useImageUploader";
 
 export default function ProfileScreen() {
   const { data: profile, isLoading, error, refetch } = useFetchQuery(
@@ -34,6 +35,7 @@ export default function ProfileScreen() {
   const [profileImage, setProfileImage] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const { token } = useAuth();
+  const { uploadImageToImgBB, updateImage } = useImageUploader();
 
   useEffect(() => {
     if (profile) {
@@ -58,71 +60,15 @@ export default function ProfileScreen() {
     },
   });
 
-  const handleUpdateField = (field, value) => {
+  const handleUpdateField = (field: string, value: string) => {
     const formData = { [field]: value };
     updateField.mutate(formData);
   };
 
   const handlePickImage = async () => {
-    try {
-      const permissionResult =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-      if (!permissionResult.granted) {
-        Alert.alert(
-          "Permission requise",
-          "Vous devez autoriser l'accès à la bibliothèque pour sélectionner une image."
-        );
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-      });
-
-      if (!result.canceled) {
-        uploadImageToImgBB(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error("Erreur lors de la sélection de l'image :", error);
-      Alert.alert("Erreur", "Impossible de sélectionner l'image.");
-    }
-  };
-
-  const uploadImageToImgBB = async (imageUri) => {
-    setIsUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("image", {
-        uri: imageUri,
-        type: "image/jpeg",
-        name: "profile.jpg",
-      });
-
-      const response = await fetch(
-        "https://api.imgbb.com/1/upload?key=913f18e85c55e3abe3618f0928cbec14",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const data = await response.json();
-      if (data.success) {
-        const imageUrl = data.data.url;
-        setProfileImage(imageUrl);
-        updateField.mutate({ image: imageUrl });
-      } else {
-        Alert.alert("Erreur", "Impossible de télécharger l'image.");
-      }
-    } catch (error) {
-      console.error("Erreur lors du téléchargement de l'image :", error);
-      Alert.alert("Erreur", "Une erreur est survenue lors du téléchargement.");
-    } finally {
-      setIsUploading(false);
+    const imageUrl = await uploadImageToImgBB();
+    if (imageUrl) {
+      updateImage(imageUrl, "/users/me", token);
     }
   };
 
