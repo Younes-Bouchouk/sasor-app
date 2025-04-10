@@ -26,14 +26,12 @@ export class UsersController {
     if (query?.length) {
         return await this.usersService.searchByPseudo(query, req.user);
     }
-    console.log("Champ vide habibi")
     //return this.usersService.findAll();
     }
 
     // Parcourir les utilisateurs
     @Get()
     findAll() { 
-        console.log("Recherche de tous les utilisateurs")
         return this.usersService.findAll();
     }
 
