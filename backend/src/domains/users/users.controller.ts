@@ -26,7 +26,7 @@ export class UsersController {
     if (query?.length) {
         return await this.usersService.searchByPseudo(query, req.user);
     }
-    console.log("Champ vide habibi")
+    //console.log("Champ vide habibi")
     //return this.usersService.findAll();
     }
 

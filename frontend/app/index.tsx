@@ -25,16 +25,20 @@ import CreateEvent from "@/app/event/createEvent";
 import { getSportImage } from "@/utils/imageMapper";
 import { fetchAPI } from "@/services/api";
 import { useAuth } from "@/contexts/AuthProvider";
+import { ref } from "yup";
 
 const { width } = Dimensions.get("window");
 
 interface EventItem {
   id: number;
+  organizerId: number;
   name: string;
   sport: string;
   location: string;
+  visibility: string;
   maxParticipants: number;
   image?: string;
+  participation: any[];
 }
 
 interface ListItemProps {
@@ -46,11 +50,11 @@ interface ListItemProps {
   viewableItems: any;
 }
 
+
 export default function EventScreen() {
   const router = useRouter();
-  const [selectedSource, setSelectedSource] = useState<"all" | "mine">("all");
+  const [selectedSource, setSelectedSource] = useState<"all" | "friends" | "joined">("all");
   const { token, user } = useAuth();
-
   const {
     data: events,
     isLoading: loadingAll,
@@ -59,27 +63,41 @@ export default function EventScreen() {
   } = useFetchQuery("events", "/events");
 
   const {
-    data: myEvents,
-    isLoading: loadingMine,
-    error: errorMine,
-    refetch: refetchMine,
-  } = useFetchQuery("myEvents", "/events/me");
+    data: eventsFollowers,
+    isLoading: loadingEventsFollowers,
+    error: errorEventsFollowers,
+    refetch: refetchEventsFollowers,
+  } = useFetchQuery("eventsFollowers", "/events/followers");
 
   useEffect(() => {
     refetchAll();
-    refetchMine();
+    refetchEventsFollowers();
   }, [token]);
 
   const [modalVisible, setModalVisible] = useState(false);
   const viewableItems = useSharedValue<ViewToken<any>[]>([]);
 
-  const getCurrentData = () => (selectedSource === "mine" ? myEvents : events);
+  const getFilteredEvents = () => {
+    if (selectedSource === "all") {
+      return events.filter((event: EventItem) => !event.participation.length && event.visibility === "PUBLIC")
+    } else if (selectedSource === "friends") {
+      return eventsFollowers.filter((event: EventItem) => !event.participation.length)
+    } else if (selectedSource === "joined") {
+      return events.filter((event: EventItem) => event.participation.length)
+    } else {
+      return events
+    }
+  }
+
+  const getAllEventsRefetch = async () => {
+    await refetchAll();
+    await refetchEventsFollowers();
+  }
+
   const getCurrentLoading = () =>
-    selectedSource === "mine" ? loadingMine : loadingAll;
+    selectedSource === "friends" ? loadingEventsFollowers : loadingAll;
   const getCurrentError = () =>
-    selectedSource === "mine" ? errorMine : errorAll;
-  const getCurrentRefetch = () =>
-    selectedSource === "mine" ? refetchMine : refetchAll;
+    selectedSource === "friends" ? errorEventsFollowers : errorAll;
 
 
   if (getCurrentLoading()) {
@@ -109,29 +127,45 @@ export default function EventScreen() {
               selectedSource === "all" && styles.selectedText,
             ]}
           >
-            Voir tous
+            Tous
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[
             styles.toggleButton,
-            selectedSource === "mine" && styles.selectedButton,
+            selectedSource === "friends" && styles.selectedButton,
           ]}
-          onPress={() => setSelectedSource("mine")}
+          onPress={() => setSelectedSource("friends")}
         >
           <Text
             style={[
               styles.toggleButtonText,
-              selectedSource === "mine" && styles.selectedText,
+              selectedSource === "friends" && styles.selectedText,
             ]}
           >
-            Voir mes événements
+            Mes abonnements
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.toggleButton,
+            selectedSource === "joined" && styles.selectedButton,
+          ]}
+          onPress={() => setSelectedSource("joined")}
+        >
+          <Text
+            style={[
+              styles.toggleButtonText,
+              selectedSource === "joined" && styles.selectedText,
+            ]}
+          >
+            Rejoint
           </Text>
         </TouchableOpacity>
       </View>
 
       <FlatList
-        data={getCurrentData()}
+        data={getFilteredEvents()}
         keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120, paddingTop: 10 }}
@@ -141,10 +175,9 @@ export default function EventScreen() {
             router={router}
             getSportImage={getSportImage}
             isOwner={
-                item.organizerId == user.id
-                // Array.isArray(myEvents) && myEvents.some((e) => e.id === item.id)
+                item.organizerId === user?.id
             }
-            refetch={getCurrentRefetch()}
+            refetch={async () => getAllEventsRefetch()}
             viewableItems={viewableItems}
           />
         )}
@@ -165,7 +198,7 @@ export default function EventScreen() {
         <CreateEvent
           onClose={() => setModalVisible(false)}
           refetch={refetchAll}
-          refetchMyEvents={refetchMine}
+          refetchMyEvents={refetchEventsFollowers}
         />
       </Modal>
     </View>

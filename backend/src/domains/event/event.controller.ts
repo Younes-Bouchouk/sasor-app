@@ -25,9 +25,10 @@ export class EventController {
         return this.eventService.createEvent(req.user.id, createEventDto);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get()
-    getAll() {
-        return this.eventService.getAllEvents();
+    getAll(@Req() req: AuthenticatedRequest) {
+        return this.eventService.getAllEvents(req.user.id);
     }
 
     // @UseGuards(JwtAuthGuard)

@@ -1,4 +1,3 @@
-
 import { 
   View, Text, Image, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Modal, Alert 
 } from "react-native";
@@ -51,7 +50,7 @@ export default function EventDetailsScreen() {
     isLoading,
     error,
   } = useFetchQuery(`event-${id}`, `/events/${id}`);
-  const { data: participants, isLoading: loadingParticipants } = useFetchQuery(
+  const { data: participants = [], isLoading: loadingParticipants } = useFetchQuery(
     `participants-${id}`,
     `/events/${id}/participants`
   ); 

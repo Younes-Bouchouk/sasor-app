@@ -40,10 +40,20 @@ export class EventService {
             where: {
                 OR: [{ visibility: 'PUBLIC' }, { visibility: 'FRIENDS' }],
             },
+            include: {
+                participation: {
+                    where: {
+                        participantId: userId,
+                    },
+                },
+            },
         });
-
+        return allEvents;
         const eventsFiltered = await Promise.all(
             allEvents.map(async (event) => {
+                if (event.organizerId == userId) {
+                    return null;
+                }
                 if (event.visibility == 'FRIENDS') {
                     const isFollower = await this.prisma.follow.findFirst({
                         where: {
@@ -76,33 +86,26 @@ export class EventService {
         });
     }
 
-        /*
+    /*
     !  Récupérer les événements créés par un utilisateur spécifique. */
     async getJoinedEvents(userId: number) {
         const participations = await this.prisma.eventParticipant.findMany({
-            where: { participantId: userId},
+            where: { participantId: userId },
             include: {
-                event: true
-            }
-        })
+                event: true,
+            },
+        });
 
         const events = await Promise.all(
-            participations.map(async (p)=>{
+            participations.map(async (p) => {
                 return {
-                
                     ...p.event,
-                    isOrganizer: p.participantId == p.event.organizerId
-                }
-            })
-        )
+                    isOrganizer: p.participantId == p.event.organizerId,
+                };
+            }),
+        );
 
-        console.log(events)
-        console.log('_________________________________________')
-        return events
-        // fitre les événements où organizerId correspond à l'userId donné.
-        return await this.prisma.event.findMany({
-            where: { organizerId: userId },
-        });
+        return events;
     }
 
     /*
@@ -118,15 +121,23 @@ export class EventService {
         const followingIds = following.map((f) => f.followingId);
 
         if (followingIds.length === 0) {
-            return 'aucun evenement ou aucun follower';
+            return [];
         }
 
         // Récupérer les événements des utilisateurs suivis
         return await this.prisma.event.findMany({
             where: {
                 organizerId: { in: followingIds },
+                OR: [{ visibility: 'PUBLIC' }, { visibility: 'FRIENDS' }],
             },
             orderBy: { plannedAt: 'desc' }, // Trier par date
+            include: {
+                participation: {
+                    where: {
+                        participantId: userId,
+                    },
+                },
+            },
         });
     }
 
