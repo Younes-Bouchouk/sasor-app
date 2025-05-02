@@ -19,7 +19,7 @@ export class UsersService {
             where: {
                 pseudo: {
                     contains: search,
-                    mode: 'insensitive',
+                    //mode: 'insensitive',
                 },
                 NOT: {
                     id: userLog.id,
