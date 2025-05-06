@@ -26,6 +26,7 @@ export class UsersController {
     if (query?.length) {
         return await this.usersService.searchByPseudo(query, req.user);
     }
+
     //return this.usersService.findAll();
     }
 
