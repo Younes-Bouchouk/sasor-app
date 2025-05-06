@@ -81,8 +81,7 @@ export default function EventDetailsScreen() {
   if (!event)
     return <Text style={styles.errorText}>Aucun événement trouvé</Text>;
 
-  console.log("Token :", user.token);
-  console.log("Event ID :", event.id);
+
 
   return (
     <View style={styles.container}>

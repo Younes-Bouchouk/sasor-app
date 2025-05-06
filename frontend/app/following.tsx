@@ -1,7 +1,8 @@
 import { useAuth } from "@/contexts/AuthProvider";
 import { useFetchQuery } from "@/hooks/useFetchQuery";
 import { fetchAPI } from "@/services/api";
-import React, { useState, useEffect } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useState, useEffect, useCallback } from "react";
 import {
     View,
     Text,
@@ -13,84 +14,56 @@ import {
     Alert,
 } from "react-native";
 
-export default function FollowPage() {
-    const [followers, setFollowers] = useState([]);
+export default function FollowingPage() {
+    const [following, setFollowing] = useState([]);
+    const { token } = useAuth(); 
     const {
-        data: followersData,
-        isLoading: loadingFollowers,
-        error: errorFollowers,
+        data: followingData,
+        isLoading: loadingFollowing,
+        error: errorFollowing,
         refetch,
-    } = useFetchQuery("follows", "/follows/me/following");
-
-    // console.log(followersData.following)
-
-    // Réexécuter la requête quand l'utilisateur change (utile après connexion/déconnexion)
-    const { token, logout } = useAuth();
-    useEffect(() => {
-        refetch();
-    }, [token]);
+    } = useFetchQuery("following", "/follows/me/following");
 
     useEffect(() => {
-        if (followers) {
-            setFollowers(followers);
+        if (followingData) {
+            setFollowing(followingData);
         }
-    }, [followers]);
+    }, [followingData]);
 
-    // Fonction pour récupérer le message d'erreur lisible
-    const getErrorMessage = (error: any) => {
-        if (error instanceof Error) {
-            return error.message;
-        }
-        return "Une erreur est survenue.";
-    };
+    useFocusEffect(
+        useCallback(() => {
+            refetch(); // Rafraîchit les données à chaque fois que la page est affichée
+        }, [refetch])
+    );
 
     return (
         <View style={styles.container}>
-            {/* Liste des abonnés */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>mes abonnements</Text>
-                {loadingFollowers ? (
-                    <ActivityIndicator size="small" color="#007AFF" />
-                ) : errorFollowers ? (
-                    <Text style={styles.errorText}>
-                        {getErrorMessage(errorFollowers)}
-                    </Text>
-                ) : followersData && (
-                    <FlatList
-                        data={followersData}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item }) => {
-                            const formattedDate = new Date(
-                                item.followedAt
-                            ).toLocaleString("fr-FR", {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                            });
-                            return (
-                                <View style={styles.listItem}>
-                                    <Image
-                                        source={{
-                                            uri:
-                                                item.following.image ||
-                                                "https://as1.ftcdn.net/v2/jpg/05/16/27/58/1000_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg",
-                                        }}
-                                        style={{
-                                            height: 50,
-                                            width: 50,
-                                            borderRadius: 25,
-                                        }}
-                                    />
-                                    <Text>{item.following.pseudo}</Text>
-                                    <Text>{formattedDate}</Text>
-                                    <TouchableOpacity
+            <Text style={styles.sectionTitle}>Mes abonnements</Text>
+            {loadingFollowing ? (
+                <ActivityIndicator size="small" color="#007AFF" />
+            ) : errorFollowing ? (
+                <Text style={styles.errorText}>Erreur : {errorFollowing.message}</Text>
+            ) : (
+                <FlatList
+                    data={following}
+                    keyExtractor={(item) => item.id.toString()}
+                    renderItem={({ item }) => (
+                        <View style={styles.listItem}>
+                            <Image
+                                source={{
+                                    uri:
+                                        item.following?.image ||
+                                        "https://as1.ftcdn.net/v2/jpg/05/16/27/58/1000_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg",
+                                }}
+                                style={styles.image}
+                            />
+                            <Text>{item.following?.pseudo || "Utilisateur inconnu"}</Text>
+                            <TouchableOpacity
                                         onPress={async () => {
                                             const removedUser = item; // Sauvegardez l'utilisateur supprimé localement
                                             try {
                                                 // Supprimez l'utilisateur localement
-                                                setFollowers((prevFollowers) =>
+                                                setFollowing((prevFollowers) =>
                                                     prevFollowers.filter(
                                                         (f) =>
                                                             f.following.id !==
@@ -127,7 +100,7 @@ export default function FollowPage() {
                                                 );
 
                                                 // Restaurez l'utilisateur supprimé en cas d'erreur
-                                                setFollowers(
+                                                setFollowing(
                                                     (prevFollowers) => [
                                                         ...prevFollowers,
                                                         removedUser,
@@ -141,12 +114,10 @@ export default function FollowPage() {
                                             Ne plus suivre
                                         </Text>
                                     </TouchableOpacity>
-                                </View>
-                            );
-                        }}
-                    />
-                )}
-            </View>
+                        </View>
+                    )}
+                />
+            )}
         </View>
     );
 }
@@ -192,5 +163,10 @@ const styles = StyleSheet.create({
         color: "red",
         fontSize: 14,
         textAlign: "center",
+    },
+    image: {
+        height: 50,
+        width: 50,
+        borderRadius: 25,
     },
 });

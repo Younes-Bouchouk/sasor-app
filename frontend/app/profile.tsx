@@ -19,10 +19,12 @@ import { useMutation } from "@tanstack/react-query";
 import { fetchAPI } from "@/services/api";
 import { useAuth } from "@/contexts/AuthProvider";
 import * as Haptics from "expo-haptics";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import Svg, { Defs, LinearGradient, Path, Stop } from "react-native-svg";
 import { useImageUploader } from "@/hooks/useImageUploader";
 
 export default function ProfileScreen() {
+  const navigation = useNavigation<NavigationProp<any>>();
   const { data: profile, isLoading, error, refetch } = useFetchQuery(
     "profile",
     "/users/me"
@@ -114,33 +116,48 @@ export default function ProfileScreen() {
             />
             <Text style={styles.changePhotoText}>Changer la photo</Text>
           </TouchableOpacity>
+          <View style={styles.followSection}>
+    <TouchableOpacity
+      style={styles.followItem}
+      onPress={() => navigation.navigate("follower")}
+    >
+      <Text style={styles.followCount}>{profile?.followersCount || 0}</Text>
+      <Text style={styles.followLabel}>Abonnés</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={styles.followItem}
+      onPress={() => navigation.navigate("following")}
+    >
+      <Text style={styles.followCount}>{profile?.followingCount || 0}</Text>
+      <Text style={styles.followLabel}>Abonnements</Text>
+    </TouchableOpacity>
+  </View>
         </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.form}>
         <InputField
           label="Pseudo"
-          
+
           value={pseudo}
-          onChangeText={(text) => {
+          onChangeText={(text: React.SetStateAction<string>) => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setPseudo(text);
-          }}
-          onSave={() => handleUpdateField("pseudo", pseudo)}
-        />
+          } }
+          onSave={() => handleUpdateField("pseudo", pseudo)} secure={undefined}        />
         <InputField
           label="Email"
           value={email}
-          onChangeText={(text) => {
+          onChangeText={(text: React.SetStateAction<string>) => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setEmail(text);
-          }}
-          onSave={() => handleUpdateField("email", email)}
-        />
+          } }
+          onSave={() => handleUpdateField("email", email)} secure={undefined}        />
         <InputField
           label="Mot de passe"
           value={password}
-          onChangeText={(text) => {
+          onChangeText={(text: React.SetStateAction<string>) => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             setPassword(text);
           }}
@@ -234,5 +251,23 @@ const styles = StyleSheet.create({
     color: "red",
     textAlign: "center",
     marginTop: 20,
+  },
+  followSection: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 20,
+    width: "100%",
+  },
+  followItem: {
+    alignItems: "center",
+  },
+  followCount: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+  },
+  followLabel: {
+    fontSize: 14,
+    color: "white",
   },
 });
