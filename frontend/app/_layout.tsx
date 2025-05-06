@@ -19,9 +19,10 @@ export default function Layout() {
             screenOptions={({ route }) => ({
               headerShown: false,
               tabBarIcon: ({ color, size }) => {
-                let iconName: "calendar-outline" | "person-outline" | "person-add-outline" | "search-outline" | undefined;
+                let iconName: "calendar-outline" | "person-outline" | "person-add-outline" | "search-outline" | "mail-open-outline" | undefined;
                 if (route.name === "index") iconName = "calendar-outline";
                 else if (route.name === "search") iconName = "search-outline";
+                else if (route.name === "event/message") iconName = "mail-open-outline";
                 return iconName ? (
                   <Ionicons name={iconName} size={size} color={color} />
                 ) : null;
