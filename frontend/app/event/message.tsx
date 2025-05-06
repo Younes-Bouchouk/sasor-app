@@ -1,4 +1,6 @@
+import { useAuth } from "@/contexts/AuthProvider";
 import { useFetchQuery } from "@/hooks/useFetchQuery";
+import { fetchAPI } from "@/services/api";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -15,6 +17,7 @@ import {
 
 export default function Message() {
   const { id } = useLocalSearchParams();
+  const {token} = useAuth()
   const {
     data: datamessage,
     isLoading,
@@ -41,20 +44,15 @@ export default function Message() {
     };console.log(messageToSend)
 
     try {
-      // Faire la requête POST pour envoyer le message à la base de données
-      const response = await fetch("http://10.57.32.140:4000/events/1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(messageToSend), // Corps de la requête avec le message
-      });
+        // Faire la requête POST pour envoyer le message à la base de données
+        const response = await fetchAPI(
+          `/events/1/messages`,
+          "POST",
+          token,
+          messageToSend
+        );
+        console.log("Réponse de l'API :", response);
 
-      if (!response.ok) {
-        throw new Error("Échec de l'envoi du message");
-      }
-
-      
       refetch();
 
       setMessageText(""); // Réinitialiser le champ du message
