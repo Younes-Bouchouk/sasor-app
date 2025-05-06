@@ -50,7 +50,7 @@ export const useImageUploader = () => {
     }
   };
 
-  const updateImage = async (url: string, endpoint: string, token: string) => {
+  const updateImage = async (url: string, endpoint: string, token: string | null) => {
     try {
       const body = { image: url };
       await fetchAPI(endpoint, "PATCH", token, body);

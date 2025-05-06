@@ -20,7 +20,7 @@ import { useImageUploader } from "@/hooks/useImageUploader";
 export default function EventDetailsScreen() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { user, token } = useAuth();
+  const {user, token } = useAuth();
   const queryClient = useQueryClient();
   const [modalVisible, setModalVisible] = useState(false);
   const isValidDate = (d: any) => {
