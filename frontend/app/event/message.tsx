@@ -19,15 +19,48 @@ export default function Message() {
     data: datamessage,
     isLoading,
     error,
+    refetch, 
   } = useFetchQuery("message", `/events/1/messages`);
 
-  const [messageText, setMessageText] = useState("");
+  const [message, setMessageText] = useState("");
+  console.log(message)
 
-  const handleSendMessage = () => {
-    if (messageText.trim() === "") return;
-    // 👇 À remplacer par une vraie requête d'envoi
-    console.log("Message envoyé :", messageText);
-    setMessageText(""); // Réinitialiser le champ
+  // ID de l'utilisateur connecté (fixé à 3 ici)
+  const sender_id = 3; 
+  const event_id = 1; 
+
+  // Fonction pour envoyer un message via une requête POST
+  const handleSendMessage = async () => {
+    if (message.trim() === "") return;
+    
+    // Créer un objet message à envoyer
+    const messageToSend = {
+      sender_id,        
+      event_id,       
+      message,   
+    };console.log(messageToSend)
+
+    try {
+      // Faire la requête POST pour envoyer le message à la base de données
+      const response = await fetch("http://10.57.32.140:4000/events/1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(messageToSend), // Corps de la requête avec le message
+      });
+
+      if (!response.ok) {
+        throw new Error("Échec de l'envoi du message");
+      }
+
+      
+      refetch();
+
+      setMessageText(""); // Réinitialiser le champ du message
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message :", error);
+    }
   };
 
   if (isLoading) {
@@ -43,7 +76,7 @@ export default function Message() {
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={{ flex: 1, padding: 16 }}>
+      <View style={{ flex: 1, padding: 16, }}>
         <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 10 }}>
           Chat de l'événement
         </Text>
@@ -59,6 +92,7 @@ export default function Message() {
                 marginBottom: 8,
                 backgroundColor: "#eee",
                 borderRadius: 5,
+                
               }}
             >
               <Image
@@ -84,10 +118,11 @@ export default function Message() {
             borderTopWidth: 1,
             borderColor: "#ccc",
             paddingTop: 8,
+            
           }}
         >
           <TextInput
-            value={messageText}
+            value={message}
             onChangeText={setMessageText}
             placeholder="Écrire un message..."
             style={{
