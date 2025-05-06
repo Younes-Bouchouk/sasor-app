@@ -5,7 +5,6 @@ import { AuthProvider } from "@/contexts/AuthProvider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import React from "react";
 import Header from "../components/ui/header"; // Import du Header
-import UserProfile from "./profile/[id]";
 
 const queryClient = new QueryClient();
 
@@ -22,7 +21,6 @@ export default function Layout() {
               tabBarIcon: ({ color, size }) => {
                 let iconName: "calendar-outline" | "person-outline" | "person-add-outline" | "search-outline" | undefined;
                 if (route.name === "index") iconName = "calendar-outline";
-                else if (route.name === "follow") iconName = "person-add-outline";
                 else if (route.name === "search") iconName = "search-outline";
                 return iconName ? (
                   <Ionicons name={iconName} size={size} color={color} />
@@ -50,7 +48,8 @@ export default function Layout() {
             <Tabs.Screen name="index" options={{ title: "Événements" }} />
             <Tabs.Screen name="search" options={{ title: "Recherche" }} />
             <Tabs.Screen name="profile" options={{ href:null }} />
-            <Tabs.Screen name="follow" options={{ title: "abonnement" }} />
+            <Tabs.Screen name="follower" options={{ href: null  }} />
+            <Tabs.Screen name="following" options={{ href: null  }} />
             <Tabs.Screen name="settings" options={{ href:null }} />
             <Tabs.Screen name="login" options={{ href: null }} />
             <Tabs.Screen name="register" options={{ href: null }} />

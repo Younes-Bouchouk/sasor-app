@@ -118,6 +118,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
           <>
             <TextInput
               placeholder="Nom de l'événement"
+              placeholderTextColor={'gray'}
               style={styles.input}
               value={eventData.name}
               onChangeText={(text) => setEventData({ ...eventData, name: text })}
@@ -131,6 +132,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
           <>
             <TextInput
               placeholder="Sport"
+              placeholderTextColor={'gray'}
               style={styles.input}
               value={sportQuery}  
               onChangeText={setSportQuery}  
@@ -157,6 +159,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
           <>
                     <TextInput
             placeholder="Lieu"
+            placeholderTextColor={'gray'}
             style={styles.input}
             value={eventData.location}
             onChangeText={(text) => {
@@ -196,6 +199,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
           <>
             <TextInput
               placeholder="Date (YYYY-MM-DD)"
+              placeholderTextColor={'gray'}
               style={styles.input}
               value={eventData.plannedAt}
               onChangeText={(text) => setEventData({ ...eventData, plannedAt: text })}
@@ -212,7 +216,8 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
         {currentStep === 5 && (
           <>
             <TextInput
-              placeholder="nomvre maximum de participant"
+              placeholder="Nombre maximum de participant"
+              placeholderTextColor={'gray'}
               style={styles.input}
               value={eventData.maxParticipants}
               onChangeText={(text) => setEventData({ ...eventData, maxParticipants: text })}
@@ -244,6 +249,7 @@ export default function CreateEvent({ onClose, refetch }: CreateEventProps) {
           <>
             <TextInput
               placeholder="Description de l'événement"
+              placeholderTextColor={'gray'}
               style={styles.input}
               value={eventData.description}
               onChangeText={(text) => setEventData({ ...eventData, description: text })}
@@ -327,6 +333,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.6)",
   },
   modalContent: {
+    maxHeight: "90%",
     backgroundColor: "#ffffff",
     padding: 24,
     borderRadius: 20,

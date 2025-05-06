@@ -53,8 +53,8 @@ export class UsersService {
             id: user.id,
             pseudo: user.pseudo,
             image: user.image,
-            isFollower: user.following.length > 0,
-            isFollowing: user.followers.length > 0,
+            isFollower: user.following.length > 0 || false,
+            isFollowing: user.followers.length > 0 || false,
         }));
 
         return usersWithIsFollower;

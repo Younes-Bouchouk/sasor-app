@@ -25,71 +25,159 @@ import CreateEvent from "@/app/event/createEvent";
 import { getSportImage } from "@/utils/imageMapper";
 import { fetchAPI } from "@/services/api";
 import { useAuth } from "@/contexts/AuthProvider";
+import { ref } from "yup";
 
 const { width } = Dimensions.get("window");
 
-// 1. Définir les types pour les props de ListItem
 interface EventItem {
   id: number;
+  organizerId: number;
   name: string;
   sport: string;
   location: string;
+  visibility: string;
   maxParticipants: number;
   image?: string;
+  participation: any[];
 }
 
 interface ListItemProps {
   item: EventItem;
-  router: any; 
+  router: any;
   getSportImage: (sport: string | undefined) => any;
   isOwner: boolean;
   refetch: () => Promise<any>;
   viewableItems: any;
 }
 
+
 export default function EventScreen() {
   const router = useRouter();
+  const [selectedSource, setSelectedSource] = useState<"all" | "friends" | "joined">("all");
+  const { token, user } = useAuth();
   const {
     data: events,
-    isLoading,
-    error,
-    refetch,
+    isLoading: loadingAll,
+    error: errorAll,
+    refetch: refetchAll,
   } = useFetchQuery("events", "/events");
-  const { data: myEvents, refetch: refetchMyEvents } = useFetchQuery(
-    "myEvents",
-    "/events/me"
-  );
-  // Réexécuter la requête quand l'utilisateur change (utile après connexion/déconnexion)
-  const { token, logout } = useAuth();
+
+  const {
+    data: eventsFollowers,
+    isLoading: loadingEventsFollowers,
+    error: errorEventsFollowers,
+    refetch: refetchEventsFollowers,
+  } = useFetchQuery("eventsFollowers", "/events/followers");
+
   useEffect(() => {
-    refetch();
-    refetchMyEvents();
+    refetchAll();
+    refetchEventsFollowers();
   }, [token]);
-  
+
   const [modalVisible, setModalVisible] = useState(false);
   const viewableItems = useSharedValue<ViewToken<any>[]>([]);
-  
 
-  if (isLoading)
+  const getFilteredEvents = () => {
+    if (selectedSource === "all") {
+      return events.filter((event: EventItem) => !event.participation.length && event.visibility === "PUBLIC")
+    } else if (selectedSource === "friends") {
+      return eventsFollowers.filter((event: EventItem) => !event.participation.length)
+    } else if (selectedSource === "joined") {
+      return events.filter((event: EventItem) => event.participation.length)
+    } else {
+      return events
+    }
+  }
+
+  const getAllEventsRefetch = async () => {
+    await refetchAll();
+    await refetchEventsFollowers();
+  }
+
+  const getCurrentLoading = () =>
+    selectedSource === "friends" ? loadingEventsFollowers : loadingAll;
+  const getCurrentError = () =>
+    selectedSource === "friends" ? errorEventsFollowers : errorAll;
+
+
+  if (getCurrentLoading()) {
     return (
       <ActivityIndicator size="large" color="#18709E" style={styles.center} />
     );
-  if (error) return <Text style={styles.errorText}>Erreur de chargement</Text>;
+  }
+
+  if (getCurrentError()) {
+    return <Text style={styles.errorText}>Erreur de chargement</Text>;
+  }
 
   return (
     <View style={styles.container}>
+      {/* Boutons de filtrage */}
+      <View style={styles.toggleContainer}>
+        <TouchableOpacity
+          style={[
+            styles.toggleButton,
+            selectedSource === "all" && styles.selectedButton,
+          ]}
+          onPress={() => setSelectedSource("all")}
+        >
+          <Text
+            style={[
+              styles.toggleButtonText,
+              selectedSource === "all" && styles.selectedText,
+            ]}
+          >
+            Tous
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.toggleButton,
+            selectedSource === "friends" && styles.selectedButton,
+          ]}
+          onPress={() => setSelectedSource("friends")}
+        >
+          <Text
+            style={[
+              styles.toggleButtonText,
+              selectedSource === "friends" && styles.selectedText,
+            ]}
+          >
+            Mes abonnements
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.toggleButton,
+            selectedSource === "joined" && styles.selectedButton,
+          ]}
+          onPress={() => setSelectedSource("joined")}
+        >
+          <Text
+            style={[
+              styles.toggleButtonText,
+              selectedSource === "joined" && styles.selectedText,
+            ]}
+          >
+            Rejoint
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       <FlatList
-        data={events}
+        data={getFilteredEvents()}
         keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120, paddingTop: 30 }}
+        contentContainerStyle={{ paddingBottom: 120, paddingTop: 10 }}
         renderItem={({ item }) => (
           <ListItem
             item={item}
             router={router}
             getSportImage={getSportImage}
-            isOwner={Array.isArray(myEvents) && myEvents.some((e) => e.id === item.id)}
-            refetch={refetch}
+            isOwner={
+                item.organizerId === user?.id
+            }
+            refetch={async () => getAllEventsRefetch()}
             viewableItems={viewableItems}
           />
         )}
@@ -109,62 +197,61 @@ export default function EventScreen() {
       <Modal visible={modalVisible} animationType="slide" transparent={true}>
         <CreateEvent
           onClose={() => setModalVisible(false)}
-          refetch={refetch}
-          refetchMyEvents={refetchMyEvents}
+          refetch={refetchAll}
+          refetchMyEvents={refetchEventsFollowers}
         />
       </Modal>
     </View>
   );
 }
 
-// 2. Composant ListItem avec les types définis
 const ListItem = React.memo(
-  ({ item, router, getSportImage, isOwner, refetch, viewableItems }: ListItemProps) => {
-    const { token } = useAuth(); // Utilisation du token pour la suppression
+  ({
+    item,
+    router,
+    getSportImage,
+    isOwner,
+    refetch,
+    viewableItems,
+  }: ListItemProps) => {
+    const { token } = useAuth();
 
     const handleDelete = async () => {
-      // Si l'utilisateur n'est pas le propriétaire, il ne peut pas supprimer l'événement
       if (!isOwner) {
         Alert.alert("Erreur", "Vous ne pouvez supprimer que vos propres événements.");
         return;
       }
 
-      Alert.alert(
-        "Supprimer l'événement",
-        "Voulez-vous vraiment supprimer cet événement ?",
-        [
-          { text: "Annuler", style: "cancel" },
-          {
-            text: "Supprimer",
-            style: "destructive",
-            onPress: async () => {
-              try {
-                // Suppression de l'événement via l'API avec vérification du token
-                await fetchAPI(`/events/${item.id}`, "DELETE", token, {});
-                await refetch(); 
-              } catch (error) {
-                console.error("Erreur lors de la suppression de l'événement:", error);
-                Alert.alert("Erreur", "Une erreur s'est produite lors de la suppression.");
-              }
-            },
+      Alert.alert("Supprimer", "Confirmez la suppression ?", [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Supprimer",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await fetchAPI(`/events/${item.id}`, "DELETE", token, {});
+              await refetch();
+            } catch (error) {
+              Alert.alert("Erreur", "Échec de la suppression.");
+            }
           },
-        ]
-      );
+        },
+      ]);
     };
 
     const rStyle = useAnimatedStyle(() => {
       const isVisible = viewableItems.value.some(
-        (viewableItem: { item: { id: any; }; }) => viewableItem.item.id === item.id
+        (viewableItem) => viewableItem.item.id === item.id
       );
       return {
         opacity: withTiming(isVisible ? 1 : 0.5),
-        transform: [{ scale: withTiming(isVisible ? 1 : 0.8) }],
+        transform: [{ scale: withTiming(isVisible ? 1 : 0.9) }],
       };
     });
 
     return (
       <Swipeable
-        enabled={isOwner} // Swipeable n'est activé que si l'utilisateur est le propriétaire
+        enabled={isOwner}
         renderRightActions={() => (
           <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
             <Ionicons name="trash" size={24} color="white" />
@@ -188,8 +275,8 @@ const ListItem = React.memo(
             />
             <View style={styles.cardContent}>
               <Text style={styles.eventName}>{item.name}</Text>
-              <Text style={styles.sportType}> {item.sport}</Text>
-              <Text style={styles.location}> {item.location}</Text>
+              <Text style={styles.sportType}>{item.sport}</Text>
+              <Text style={styles.location}>{item.location}</Text>
               <Text style={styles.participants}>
                 {item.maxParticipants} Sasoriens max
               </Text>
@@ -205,7 +292,6 @@ const ListItem = React.memo(
     );
   }
 );
-
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "white", paddingTop: 10 },
@@ -240,7 +326,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 5,
   },
-
   deleteButton: {
     backgroundColor: "red",
     justifyContent: "center",
@@ -273,6 +358,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   floatingButtonText: { color: "#fff", fontSize: 30, fontWeight: "bold" },
+
+  // Boutons toggle (voir tous / mes événements)
+  toggleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 10,
+  },
+  toggleButton: {
+    padding: 10,
+    borderRadius: 5,
+  },
+  toggleButtonText: {
+    color: "#18709E",
+    fontWeight: "bold",
+  },
+  selectedButton: {
+    backgroundColor: "#18709E",
+  },
+  selectedText: {
+    color: "white",
+  },
 });
 
-export { ListItem }; // exportation nommée de ListItem
+export { ListItem };

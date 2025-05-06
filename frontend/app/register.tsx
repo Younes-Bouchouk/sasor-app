@@ -79,8 +79,9 @@ export default function RegisterScreen() {
             control={control}
             render={({ field: { onChange, value } }) => (
               <TextInput
-                style={styles.input}
-                placeholder="Pseudo"
+              style={styles.input}
+              placeholder="Pseudo"
+              placeholderTextColor={'gray'}
                 value={value}
                 onChangeText={onChange}
               />
@@ -98,6 +99,7 @@ export default function RegisterScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Email"
+                placeholderTextColor={'gray'}
                 value={value}
                 onChangeText={onChange}
                 keyboardType="email-address"
@@ -116,6 +118,7 @@ export default function RegisterScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Mot de passe"
+                placeholderTextColor={'gray'}
                 value={value}
                 onChangeText={onChange}
                 secureTextEntry
@@ -134,6 +137,7 @@ export default function RegisterScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Confirmer le mot de passe"
+                placeholderTextColor={'gray'}
                 value={value}
                 onChangeText={onChange}
                 secureTextEntry
