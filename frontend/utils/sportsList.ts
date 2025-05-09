@@ -1,7 +1,7 @@
 export const sportsList = [
     // 🌍 Sports Collectifs
     "Football", "Basketball", "Handball", "Volleyball", "Rugby", "Cricket", "Hockey sur glace", 
-    "Hockey sur gazon", "Waterpolo", "Baseball", "Softball", "Lacrosse", "Ultimate Frisbee",
+    "Hockey sur gazon", "Waterpolo", "Baseball", "Softball", "Lacrosse", "Ultimate Frisbee", "Futsal",
   
     // 🎾 Sports de Raquette
     "Tennis", "Badminton", "Squash", "Ping-pong (Tennis de table)", "Padel",
@@ -37,6 +37,6 @@ export const sportsList = [
     
     // 🏹 Sports Traditionnels & Divers
     "Paddle", "Pelote basque", "Sepak Takraw", "Kabaddi", "Boomerang", "Motoball", 
-    "Chessboxing", "Hurling", "Shinty", "Kendo", "Sumo", "Bouzkachi", "Bossaball"
+    "Chessboxing", "Hurling", "Shinty", "Kendo", "Sumo", "Bouzkachi", "Bossaball", "Gamelle"
   ];
   

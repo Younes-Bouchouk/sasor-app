@@ -69,6 +69,13 @@ export default function EventScreen() {
     refetch: refetchEventsFollowers,
   } = useFetchQuery("eventsFollowers", "/events/followers");
 
+  const {
+    data: eventsJoined,
+    isLoading: loadingEventsJoined,
+    error: errorEventsJoined,
+    refetch: refetchEventsJoined,
+  } = useFetchQuery("eventsJoined", "/events/me");
+
   useEffect(() => {
     refetchAll();
     refetchEventsFollowers();
@@ -83,7 +90,7 @@ export default function EventScreen() {
     } else if (selectedSource === "friends") {
       return eventsFollowers.filter((event: EventItem) => !event.participation.length)
     } else if (selectedSource === "joined") {
-      return events.filter((event: EventItem) => event.participation.length)
+      return eventsJoined.map((event: EventItem) => event)
     } else {
       return events
     }
