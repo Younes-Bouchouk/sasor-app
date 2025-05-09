@@ -24,7 +24,7 @@ export default function Message() {
     isLoading,
     error,
     refetch, 
-  } = useFetchQuery("message", `/events/${id}/messages`);
+  } = useFetchQuery("message", `/events/${id}/messages`,100);
 
   const [message, setMessageText] = useState("");
   console.log(message)
