@@ -57,7 +57,7 @@ export default function Layout() {
             <Tabs.Screen name="event/[id]" options={{ href: null }} />
             <Tabs.Screen name="event/createEvent" options={{ href: null }} />
             <Tabs.Screen name="profile/[id]" options={{href:null  }} />
-            <Tabs.Screen name="event/message" options={{href:null  }} />
+            <Tabs.Screen name="event/message/[id]" options={{href:null  }} />
             <Tabs.Screen name="event/eventsList" options={{title:"eventsList"  }} />
           </Tabs>
         </QueryClientProvider>

@@ -46,7 +46,7 @@ export default function EventsList() {
             viewableItems={viewableItems}
             onPress={() =>
               router.push({
-                pathname: "/event/message",
+                pathname: "/event/message/[id]",
                 params: { id: item.id.toString() },
               })
             }

@@ -17,20 +17,20 @@ import {
 
 export default function Message() {
   const { id } = useLocalSearchParams();
-  const {token} = useAuth()
+  
+  const {token, user} = useAuth()
   const {
     data: datamessage,
     isLoading,
     error,
     refetch, 
-  } = useFetchQuery("message", `/events/1/messages`);
+  } = useFetchQuery("message", `/events/${id}/messages`);
 
   const [message, setMessageText] = useState("");
   console.log(message)
+  console.log(user)
 
-  // ID de l'utilisateur connecté (fixé à 3 ici)
-  const sender_id = 3; 
-  const event_id = 1; 
+ 
 
   // Fonction pour envoyer un message via une requête POST
   const handleSendMessage = async () => {
@@ -38,15 +38,15 @@ export default function Message() {
     
     // Créer un objet message à envoyer
     const messageToSend = {
-      sender_id,        
-      event_id,       
+      sender_id : user?.id,        
+      event_id : id,       
       message,   
     };console.log(messageToSend)
 
     try {
         // Faire la requête POST pour envoyer le message à la base de données
         const response = await fetchAPI(
-          `/events/1/messages`,
+          `/events/${id}/messages`,
           "POST",
           token,
           messageToSend
