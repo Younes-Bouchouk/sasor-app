@@ -60,16 +60,16 @@ on va expliquer étape par étape en deux partie front et back
   ```sh
   npm install 
   ```
-
-* migrer la bdd 
+  
+* Migrer la base de donnée
   ```sh
- npx prisma migrate dev --name init 
- ```
- * génerer le client prisma 
-  ```sh
- npx prisma generate  
- ```
+  npx prisma migrate dev --name init 
+  ```
 
+* Générer le client prisma 
+  ```sh
+  npx prisma generate
+  ```
 
 ##### - Frontend
 
