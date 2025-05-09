@@ -8,6 +8,7 @@ import {
     Delete,
     UseGuards,
     Req,
+    Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,6 +19,16 @@ import { AuthenticatedRequest } from 'src/types/AuthUser';
 @Controller('users')
 export class UsersController {
     constructor(private readonly usersService: UsersService) {}
+
+    @UseGuards(JwtAuthGuard)
+    @Get()
+    async findUsers(@Req() req: AuthenticatedRequest, @Query('search') query?: string) {
+    if (query?.length) {
+        return await this.usersService.searchByPseudo(query, req.user);
+    }
+
+    //return this.usersService.findAll();
+    }
 
     // Parcourir les utilisateurs
     @Get()

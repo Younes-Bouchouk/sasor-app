@@ -27,6 +27,12 @@ export class AuthService {
         // Si un utilisateur avec le même email existe, je retour l'erreur
         if (existingUser) throw new BadRequestException("L'email est déjà utilisé");
 
+                // Je créer une variable dans laquelle j'effectue une requête pour récupérer un utilisateur avec l'email saisie
+                const existingPseudo = await this.prisma.user.findUnique({ where: { pseudo: pseudo } });
+
+                // Si un utilisateur avec le même email existe, je retour l'erreur
+                if (existingPseudo) throw new BadRequestException("Le pseudo est déjà utilisé");
+
         const hashedPassword = await hash(password, 10);
 
         // Sinon, j'effectue la requête qui me permet de créer une nouvelle ligne dans la table User
@@ -35,7 +41,8 @@ export class AuthService {
                 pseudo,
                 email,
                 password: hashedPassword,
-                birthday,
+                birthday: new Date(birthday),
+                sexe: registerDto.sexe
             }
         });
 

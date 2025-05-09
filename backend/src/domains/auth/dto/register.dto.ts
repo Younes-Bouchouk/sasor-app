@@ -1,4 +1,4 @@
-import { IsDate, IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsDate, IsEmail, IsIn, IsNotEmpty, IsString, Length } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class RegisterDto {
@@ -25,4 +25,10 @@ export class RegisterDto {
     @IsDate({ message: "La date de naissance doit être au format ISO-8601" })
     @IsNotEmpty({ message: "La date de naissance ne doit pas être vide" })
     birthday: Date
+
+    @IsString()
+    @IsIn(['masculin', 'féminin', 'autre'], {
+        message: 'Le sexe doit être "masculin", "féminin" ou "autre".',
+    })
+    sexe: string;
 }

@@ -23,10 +23,14 @@ export class UpdateEventDto {
   location?: string;
 
   @IsOptional()
-  @IsEnum(['PUBLIC', 'PRIVATE', 'FRIENDS-ONLY'])
+  @IsEnum(['PUBLIC', 'PRIVATE', 'FRIENDS'])
   visibility?: EventVisibility;
 
   @IsOptional()
   @IsDate()
   plannedAt?: Date;
+  
+  @IsString()
+  @IsOptional()
+  image?: string;
 }

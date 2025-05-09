@@ -125,7 +125,7 @@ export class FollowsService {
             },
             include: {
                 follower: {
-                    select: { id: true, pseudo: true },
+                    select: { id: true, pseudo: true, image: true  },
                 },
             },
         });
@@ -143,7 +143,7 @@ export class FollowsService {
             },
             include: {
                 following: {
-                    select: { id: true, pseudo: true },
+                    select: { id: true, pseudo: true, image: true },
                 },
             },
         });

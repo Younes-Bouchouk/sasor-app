@@ -24,7 +24,10 @@ export class EventsMessagesService {
             throw new BadRequestException("L'event n'est plus disponible");
 
         // On vérifie que l'utilisateur participe à l'event
-        const isParticipant = await this.checkEventParticipation(eventId,user.id,);
+        const isParticipant = await this.checkEventParticipation(
+            eventId,
+            user.id,
+        );
         if (!isParticipant)
             throw new BadRequestException('Vous ne partcipez pas à cet event');
 
@@ -56,6 +59,7 @@ export class EventsMessagesService {
         // Récupère tous les messages de l'event
         return await this.prisma.eventMessage.findMany({
             where: { eventId },
+            include: { sender: { select: { pseudo: true, image: true } } },
         });
     }
 

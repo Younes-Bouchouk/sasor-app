@@ -25,6 +25,7 @@ export class AuthController {
 
     @Post('register')
     async register(@Body() registerDto: RegisterDto) {
+        console.log("Route pour créer un compte")
         return await this.authService.register(registerDto);
     }
 
