@@ -63,7 +63,7 @@ on va expliquer étape par étape en deux partie front et back
 
 * migrer la bdd 
  ```sh
-npx prisma migrate dev --name "init"  
+npx prisma migrate dev --name init 
 ```
 * génerer le client prisma 
  ```sh
