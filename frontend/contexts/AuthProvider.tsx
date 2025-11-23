@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { fetchAPI } from "@/services/api"; // Assure-toi d'avoir une fonction générique fetchAPI
+import { fetchAPI } from "@/services/api"; 
 import { router } from "expo-router";
 import { QueryClient } from "@tanstack/react-query";
 
