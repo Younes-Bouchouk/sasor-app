@@ -141,15 +141,13 @@ export class EventService {
         });
     }
 
-    /*
-                         ! trouver un seul evenement avec son id*/
+    /* Trouver un seul événement avec son id */
     async getEventById(eventId: number) {
         return await this.prisma.event.findUnique({
             where: { id: Number(eventId) },
         });
     }
-    /* 
-                          !Modifier un événement existant.*/
+    /* Modifier un événement existant. */
     async updateEvent(eventId: number, data: UpdateEventDto) {
         return await this.prisma.event.update({
             where: { id: Number(eventId) }, // préciser le type number
@@ -158,8 +156,7 @@ export class EventService {
             },
         });
     }
-    /* 
-                          !Supprimer un événement.*/
+    /* Supprimer un événement. */
     async deleteEvent(eventId: number) {
         // Étape 1: Supprimer les participants de l'événement
         await this.prisma.eventParticipant.deleteMany({
@@ -172,8 +169,7 @@ export class EventService {
         });
     }
 
-    /*
-                          !Obtenir la liste des participants d'un événement.*/
+    /* Obtenir la liste des participants d'un événement. */
     async getEventParticipants(eventId: number) {
         return await this.prisma.eventParticipant.findMany({
             where: { eventId: Number(eventId) },
@@ -184,8 +180,7 @@ export class EventService {
             },
         });
     }
-    /*
-                          !Ajouter un utilisateur comme participant à un événement.*/
+    /* Ajouter un utilisateur comme participant à un événement. */
     async joinEvent(userId: number, eventId: number) {
         // Récupérer l'événement
         const event = await this.prisma.event.findUnique({

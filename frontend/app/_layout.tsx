@@ -14,6 +14,7 @@ export default function Layout() {
       <AuthProvider>
         <QueryClientProvider client={queryClient}>
           {/* Ajout du Header */}
+          <Layout/>
           <Header />
           <Tabs
             screenOptions={({ route }) => ({
@@ -58,7 +59,7 @@ export default function Layout() {
             <Tabs.Screen name="event/createEvent" options={{ href: null }} />
             <Tabs.Screen name="profile/[id]" options={{href:null  }} />
             <Tabs.Screen name="event/message/[id]" options={{href:null  }} />
-            <Tabs.Screen name="event/eventsList" options={{title:"eventsList"  }} />
+            <Tabs.Screen name="event/eventsList" options={{ title:"eventsList"  }} />
           </Tabs>
         </QueryClientProvider>
       </AuthProvider>

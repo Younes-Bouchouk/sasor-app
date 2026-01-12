@@ -2,7 +2,7 @@ import { useAuth } from "@/contexts/AuthProvider";
 import { useFetchQuery } from "@/hooks/useFetchQuery";
 import { fetchAPI } from "@/services/api";
 import { useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
@@ -17,20 +17,15 @@ import {
 
 export default function Message() {
   const { id } = useLocalSearchParams();
-  
   const {token, user} = useAuth()
   const {
     data: datamessage,
     isLoading,
     error,
     refetch, 
-  } = useFetchQuery("message", `/events/${id}/messages`);
+  } = useFetchQuery("message", `/events/${id}/messages`, 100);
 
-  const [message, setMessageText] = useState("");
-  console.log(message)
-  console.log(user)
-
- 
+  const [message, setMessageText] = useState(""); 
 
   // Fonction pour envoyer un message via une requête POST
   const handleSendMessage = async () => {

@@ -37,13 +37,15 @@ export default function EventsList() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120, paddingTop: 10 }}
         renderItem={({ item }) => (
+          // <Text>Test</Text>
           <EventCard
             item={item}
             router={router}
             getSportImage={getSportImage}
-            isOwner={item.organizerId === user?.id}
-            refetch={async () => refetchEventsJoined}
-            viewableItems={viewableItems}
+            // isOwner={item.organizerId === user?.id}
+            isOwner={false}
+            refetch={refetchEventsJoined}
+            viewableItems={viewableItems.value}
             onPress={() =>
               router.push({
                 pathname: "/event/message/[id]",

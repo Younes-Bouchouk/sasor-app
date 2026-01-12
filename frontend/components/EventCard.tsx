@@ -64,15 +64,15 @@ const EventCard = ({
       },
     ]);
   };
-  const rStyle = useAnimatedStyle(() => {
-    const isVisible = viewableItems.value.some(
-      (viewableItem: { item: { id: number; }; }) => viewableItem.item.id === item.id
-    );
-    return {
-      opacity: withTiming(isVisible ? 1 : 0.5),
-      transform: [{ scale: withTiming(isVisible ? 1 : 0.9) }],
-    };
-  });
+  // const rStyle = useAnimatedStyle(() => {
+  //   const isVisible = viewableItems.value.some(
+  //     (viewableItem: { item: { id: number; }; }) => viewableItem.item.id === item.id
+  //   );
+  //   return {
+  //     opacity: withTiming(isVisible ? 1 : 0.5),
+  //     transform: [{ scale: withTiming(isVisible ? 1 : 0.9) }],
+  //   };
+  // });
 
   return (
     <Swipeable
@@ -83,7 +83,9 @@ const EventCard = ({
         </TouchableOpacity>
       )}
     >
-      <Animated.View style={[styles.cardContainer, rStyle]}>
+      <Animated.View style={[styles.cardContainer, 
+        // rStyle
+        ]}>
         <TouchableOpacity
           style={styles.card}
           onLongPress={isOwner ? handleDelete : undefined}
