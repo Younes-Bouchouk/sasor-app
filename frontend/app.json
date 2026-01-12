@@ -10,14 +10,14 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "icon":{
+      "icon": {
         "light": "@/assets/images/splash-icon-white.png",
         "dark": "@/assets/images/splash-icon-dark.png",
         "tinted": "@/assets/images/splash-icon-dark.png"
       }
     },
     "android": {
-      "icon":{
+      "icon": {
         "light": "@/assets/images/splash-icon-white.png",
         "dark": "@/assets/images/splash-icon-dark.png",
         "tinted": "@/assets/images/splash-icon-dark.png"
@@ -27,7 +27,6 @@
         "backgroundColor": "#ffffff"
       }
     },
-    
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -49,7 +48,9 @@
         {
           "photosPermission": "This app accesses your photos to let you share them with your friends."
         }
-      ]
+      ],
+      "expo-font",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

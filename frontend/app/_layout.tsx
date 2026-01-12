@@ -23,6 +23,9 @@ export default function Layout() {
                 if (route.name === "index") iconName = "calendar-outline";
                 else if (route.name === "search") iconName = "search-outline";
                 else if (route.name === "event/eventsList") iconName = "mail-open-outline";
+                else if (route.name === "map") iconName = "map";
+                else if (route.name === "payment") iconName = "diamond";
+
                 return iconName ? (
                   <Ionicons name={iconName} size={size} color={color} />
                 ) : null;
@@ -47,6 +50,7 @@ export default function Layout() {
             })}
           >
             <Tabs.Screen name="index" options={{ title: "Événements" }} />
+            <Tabs.Screen name="map" options={{ title: "Map" }} />
             <Tabs.Screen name="search" options={{ title: "Recherche" }} />
             <Tabs.Screen name="profile" options={{ href:null }} />
             <Tabs.Screen name="follower" options={{ href: null  }} />
@@ -59,6 +63,8 @@ export default function Layout() {
             <Tabs.Screen name="profile/[id]" options={{href:null  }} />
             <Tabs.Screen name="event/message/[id]" options={{href:null  }} />
             <Tabs.Screen name="event/eventsList" options={{title:"eventsList"  }} />
+                        <Tabs.Screen name="payment" options={{ title: "payment" }} />
+
           </Tabs>
         </QueryClientProvider>
       </AuthProvider>
