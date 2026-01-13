@@ -11,9 +11,10 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useAuth } from "../contexts/AuthProvider";
-import { fetchAPI } from "../services/api";
+import { useAuth } from "@/contexts/AuthProvider";
+import { fetchAPI } from "@/services/api";
 import { useNavigation } from "@react-navigation/native";
+import { router } from "expo-router";
 
 const schema = yup.object({
   email: yup.string().email("Email invalide").required("Email obligatoire"),
@@ -40,7 +41,6 @@ export default function LoginScreen() {
 
     try {
       const result = await fetchAPI("/auth/login", "POST", null, data);
-
       if (!result.access_token) {
         setLoginError("Email ou mot de passe incorrect.");
         setLoading(false);
@@ -48,7 +48,10 @@ export default function LoginScreen() {
       }
 
       await login(result.access_token);
-      navigation.navigate("index"); 
+      // navigation.navigate("index");
+      router.push({
+        pathname: '/'
+      }) 
     } catch (error) {
       console.error("Erreur de connexion :", error);
       setLoginError("Une erreur est survenue. Veuillez réessayer.");

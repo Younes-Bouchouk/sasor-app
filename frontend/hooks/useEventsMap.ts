@@ -36,14 +36,17 @@ export function useEventsMap() {
   const geocodeLocation = useCallback(async (location: string): Promise<{ lat: number; lon: number } | null> => {
     try {
       let address = location;
+      console.log("address :", address)
       
       if (!address.toLowerCase().includes('france')) {
         address = `${address}, France`;
       }
 
+      console.log("CALL API PHOTON")
       const response = await fetch(
         `https://photon.komoot.io/api/?q=${encodeURIComponent(address)}&limit=1&lang=fr`
       );
+      console.log("CALL API PHOTON FINITO")
 
       const data = await response.json();
       

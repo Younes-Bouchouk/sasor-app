@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import EventMap from '../components/EventMap';
+import EventMap from '../../components/EventMap';
 
 export default function MapScreen() {
   return (

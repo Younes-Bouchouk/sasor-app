@@ -1,7 +1,7 @@
 import { useFetchQuery } from "@/hooks/useFetchQuery";
 import React from "react";
 import { View, Text, FlatList, ViewToken } from "react-native";
-import { ListItem } from "..";
+import { ListItem } from "../old-ndex";
 import { useRouter } from "expo-router";
 import EventCard from "@/components/EventCard";
 import { getSportImage } from "@/utils/imageMapper";
