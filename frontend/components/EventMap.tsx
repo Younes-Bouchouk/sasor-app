@@ -1,4 +1,3 @@
-// components/EventMap.tsx
 import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
@@ -177,7 +176,6 @@ const EventMap = () => {
     return visibility;
   };
 
-  // Style de la carte noir et blanc (gardé tel quel)
   const blackAndWhiteMapStyle = [
     {
       "elementType": "geometry",
@@ -523,7 +521,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   
-  // STYLES POUR LES BULLES
   
   bubbleContainer: {
     alignItems: 'center',
@@ -601,7 +598,6 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
   
-  // Styles pour le callout
   calloutContainer: {
     backgroundColor: '#000',
     padding: 12,
@@ -680,7 +676,6 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   
-  // Styles pour le modal
   modalImage: {
     width: '100%',
     height: 150,

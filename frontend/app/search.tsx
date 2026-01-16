@@ -106,7 +106,7 @@ const UserItem = ({
                     style={styles.avatar}
                 />
                 <Text style={styles.username}>{user.pseudo}</Text>
-            </View>
+            </View>é
 
             <View style={styles.actions}>
                 {user.isFollowing && (

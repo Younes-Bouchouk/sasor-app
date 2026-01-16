@@ -1,4 +1,4 @@
-// hooks/useEventsMap.ts
+
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthProvider';
 import { useFetchQuery } from './useFetchQuery';
